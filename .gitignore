@@ -1,0 +1,16 @@
+# Django specific ignores
+/static/ 
+/staticfiles/
+/media/
+/myenv
+.vscode/settings.json
+db.sqlite3
+__pycache__/
+*.py[cod]
+*.log
+
+# Environments & tooling
+.env
+.env.*        # keep real secrets out of git
+.pytest_cache/
+*.sqlite3
