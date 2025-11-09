@@ -2,6 +2,13 @@
 
 A foundational Django project designed to be a **reusable backend scaffold** for future applications. This setup provides a secure, modular structure that can be extended with new features while maintaining clean separation between authentication, profile management, and data access through APIs.
 
+> ⚠️ **Work in Progress**
+>
+> This project is currently undergoing active development.  
+> Features, configuration files, and environment variables may change as the CDN and deployment phases are finalized.  
+> Documentation is being updated alongside implementation to ensure accuracy.  
+> Expect minor adjustments to settings, Docker configuration, and environment variables until Phase 3.5 (Cloudflare R2) is complete.
+
 ---
 
 ## 🎯 Project Overview
@@ -184,21 +191,53 @@ pytest -q
 
 ---
 
+## 🚀 Phase 1 – Initial Project Setup
+
+This phase marked the creation of the Django project and the establishment of its fundamental structure.  
+The objective was to get a functioning baseline environment that could later evolve into a modular, containerized system.
+
+**Highlights:**
+- Created the initial Django project and confirmed successful run of the default development server.
+- Configured virtual environment for Python dependency isolation.
+- Installed Django and supporting core packages via `pip`.
+- Initialized Git repository and added `.gitignore` for virtual environment, migrations, and configuration files.
+- Defined base app and templates to verify routing and rendering.
+- Verified admin site accessibility and default SQLite database migration.
+- Added preliminary README outlining project purpose and roadmap.
+
+**Outcome:**  
+A working Django foundation was established — lightweight, single-settings, and fully local — ready to expand in Phase 2 into a modular configuration structure and, later, containerized infrastructure.
+
+---
+
 ## 📘 Phase 2: Modular Settings and Environment Isolation
 
-### Key Enhancements
+This phase established the foundation of the Django project, including environment configuration, initial app structure, and baseline dependencies.  
+The goal was to create a clean, modular framework that supports scaling into containerization, database integration, and future feature phases.
 
-* Introduced modular settings system (`base/dev/prod`).
-* Fixed `BASE_DIR` path resolution to project root.
-* Added `DJANGO_SETTINGS_MODULE` to `.env`.
-* Confirmed correct database file placement and migrations.
-* Created standalone troubleshooting guide for configuration imports.
+**Highlights:**
+- Initialized Django project with modular app architecture (`config/` and core apps directory).
+- Created separate settings files (`base.py`, `dev.py`, and later `prod.py`) for environment-specific configuration.
+- Configured virtual environment and initial dependency management (`requirements.txt`).
+- Set up Git version control with appropriate `.gitignore` entries to exclude environment files and system artifacts.
+- Verified successful local server startup (`python manage.py runserver`).
+- Established basic app routing and `urls.py` structure for future expansion.
+- Added README scaffold and documentation folder to track progressive development phases.
+
+**Outcome:**  
+Django was successfully initialized and fully operational in development mode, serving as the stable foundation for subsequent phases — including database integration, Dockerization, and CDN implementation.
 
 ### Benefits
 
 * Cleaner environment handling (no more mixed settings).
 * Stable database and file path behavior.
 * Ready for Docker integration and PostgreSQL migration in Phase 3.
+
+> 🗒️ **Side Note – Original Settings File**
+>
+> The original `settings.py` file created during project initialization has been preserved in the `config/` directory as a backup reference.  
+> It is **not used for development or deployment**, as the project now follows a modular settings structure (`base.py`, `dev.py`, `prod.py`) introduced in Phase 2.  
+> The backup remains available for historical context and rollback reference.
 
 ### Updated Project Structure
 
@@ -223,8 +262,8 @@ project_root/
 ### Environment Variables Update
 
 ```dotenv
-SECRET_KEY=dev-dont-use-in-prod
-DEBUG=True
+DJANGO_SECRET_KEY=dev-dont-use-in-prod
+DJANGO_DEBUG=True
 ALLOWED_HOSTS=localhost,127.0.0.1
 DATABASE_URL=sqlite:///db.sqlite3
 DJANGO_SETTINGS_MODULE=config.settings.dev
@@ -232,12 +271,56 @@ DJANGO_SETTINGS_MODULE=config.settings.dev
 
 ---
 
-## 🔮 Next Steps (Phase 3 Preview)
+### Phase 2.5 – PostgreSQL Database Integration
+This phase introduced the migration from SQLite to a containerized PostgreSQL database using Docker.  
+The main goals were stability, scalability, and environment consistency between local and production setups.
 
-* Add Docker Compose for PostgreSQL.
-* Introduce Whitenoise and Cloudflare CDN integration.
-* Extend DRF for profile editing endpoints.
-* Add modular production security settings.
+**Highlights:**
+- Added PostgreSQL service to `docker-compose.yml` with persistent volume storage.
+- Updated `config/settings/dev.py` to use PostgreSQL as the default backend.
+- Configured environment variables through `.env` using `python-decouple`.
+- Verified connectivity by running migrations, creating a superuser, and confirming data persistence across container restarts.
+- Expanded documentation with database setup, Docker workflow, and health check commands.
+
+This marks the completion of database containerization, ensuring all data operations now run against a production-grade system.
+
+---
+
+### ☁️ Phase 3 – CDN Implementation (MinIO)
+
+This phase introduces **object storage and CDN emulation** for handling static and media files outside the Django container.  
+The objective is to separate file storage from the core app while preparing the system for a future production-grade CDN.
+
+**Highlights:**
+- Integrated **MinIO** as a local, S3-compatible object storage service via Docker.
+- Configured Django to use `django-storages` and the S3 API for file uploads.
+- Updated environment variables to include MinIO credentials (`MINIO_ACCESS_KEY`, `MINIO_SECRET_KEY`, `MINIO_BUCKET_NAME`, `MINIO_ENDPOINT_URL`).
+- Verified full upload/download flow locally using the same API calls as Cloudflare R2.
+- Implemented persistent Docker volume for local media file retention.
+- Added documentation for MinIO container setup, credentials, and connection testing.
+
+**Outcome:**  
+Django now stores and retrieves files through MinIO using the same configuration pattern as production storage (S3 API).  
+This creates a **zero-cost, offline-capable** development environment that mirrors real CDN behavior for testing.
+
+---
+
+### 🌐 Phase 3.5 – Cloudflare R2 Integration (Production CDN)
+
+Building on the MinIO foundation, this phase migrates the storage backend to **Cloudflare R2**, providing global content delivery and scalability.
+
+**Highlights:**
+- Replaced MinIO credentials with Cloudflare R2 configuration:
+  - `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_ENDPOINT_URL`.
+- Updated `config/settings/prod.py` to point to R2’s S3-compatible endpoint.
+- Verified seamless transition by using the same `django-storages` interface.
+- Configured `MEDIA_URL` to serve files through Cloudflare’s edge network for low-latency delivery.
+- Documented environment setup, permissions, and R2 bucket management.
+- Confirmed upload, retrieval, and cache-control behavior across global endpoints.
+
+**Outcome:**  
+The project now benefits from a **true CDN**, with globally distributed edge caching, zero egress costs, and no infrastructure maintenance.  
+Cloudflare R2 delivers production-grade reliability and performance, completing the app’s scalable media-handling pipeline.
 
 ---
 
@@ -257,3 +340,6 @@ This project isn’t just a starting point — it’s a **learning scaffold** fo
 * How environment-based configuration supports scalable deployment.
 
 Understanding these principles now will save massive time and headaches when projects grow from small experiments into full-scale applications.
+
+
+
