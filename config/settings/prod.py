@@ -17,4 +17,14 @@ SECURE_HSTS_PRELOAD = True
 # MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 # STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
-# In prod you'll set DATABASE_URL to Postgres
+# In prod you'll set DATABASE to Postgres
+DATABASES = {
+    'default': {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("POSTGRES_DB_PROD", "language_app_dev"),
+        "USER": config("POSTGRES_USER_PROD", "language_app_user"),
+        "PASSWORD": config("POSTGRES_PASSWORD_PROD", "changeme"),
+        "HOST": config("POSTGRES_HOST_PROD", "db"),  # Docker service name
+        "PORT": config("POSTGRES_PORT_PROD", "5432"),
+    }
+}

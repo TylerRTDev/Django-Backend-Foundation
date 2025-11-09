@@ -77,7 +77,7 @@ class Profile(models.Model):
     bio = models.TextField(blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
     timezone = models.CharField(max_length=64, default="Europe/London")
-    language = models.CharField(max_length=32, default="")
+    language = models.CharField(max_length=32, null=True, blank=True, default="")
 
     avatar = models.ImageField(
         upload_to=user_avatar_upload_to,
