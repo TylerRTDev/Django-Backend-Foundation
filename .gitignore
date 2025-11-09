@@ -3,9 +3,9 @@
 /staticfiles/
 /media/
 /myenv
-.vscode/settings.json
-db.sqlite3
-__pycache__/
+# .vscode/settings.json
+# db.sqlite3
+# __pycache__/
 *.py[cod]
 *.log
 
@@ -14,3 +14,4 @@ __pycache__/
 .env.*        # keep real secrets out of git
 .pytest_cache/
 *.sqlite3
+
