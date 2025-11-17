@@ -12,19 +12,12 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 from decouple import config
-import environ
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # Adjusted to point to project root directory (three levels up)
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-env = environ.Env(
-    DEBUG=(bool, False),
-)
-
-# Read your .env file (adjust path if needed)
-environ.Env.read_env(BASE_DIR / ".env")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('DJANGO_SECRET_KEY')
