@@ -12,6 +12,7 @@ class ProfileInline(admin.StackedInline):
 @admin.register(User)
 class UserAdmin(DjangoUserAdmin):
     model = User
+    # Add username to the admin display and search fields (Optional)
     list_display = ("email", "first_name", "last_name", "is_staff", "is_superuser", "is_verified")
     list_filter = ("is_staff", "is_superuser", "is_verified", "is_active")
     ordering = ("email",)
@@ -19,6 +20,7 @@ class UserAdmin(DjangoUserAdmin):
 
     fieldsets = (
         (None, {"fields": ("email", "password")}),
+        # Add username fieldset if username is used (optional)
         (_("Personal info"), {"fields": ("first_name", "last_name", "is_verified")}),
         (_("Permissions"), {"fields": ("is_active", "is_staff", "is_superuser", "groups", "user_permissions")}),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
@@ -27,6 +29,7 @@ class UserAdmin(DjangoUserAdmin):
     add_fieldsets = (
         (None, {
             "classes": ("wide",),
+            # Add username to the add user form fields (Optional)
             "fields": ("email", "password1", "password2", "is_staff", "is_superuser"),
         }),
     )

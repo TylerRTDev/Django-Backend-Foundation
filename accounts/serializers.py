@@ -16,5 +16,6 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
+        # Add username to the serialized fields (Optional)
         fields = ["id", "email", "first_name", "last_name", "is_verified", "profile"]
         read_only_fields = ["id", "is_verified"]

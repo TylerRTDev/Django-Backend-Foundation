@@ -29,5 +29,11 @@ COPY . /app/
 # 7. Expose the port Django will run on (for documentation; compose handles mapping)
 EXPOSE 8000
 
-# 8. Default command (can be overridden by docker-compose)
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# 8. Set up entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+
+# 9. Make entrypoint script executable
+RUN chmod +x /entrypoint.sh
+
+# 10. Define the default command to run the entrypoint script
+CMD ["/entrypoint.sh"]

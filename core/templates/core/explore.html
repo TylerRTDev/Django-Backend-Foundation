@@ -1,0 +1,65 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %} Explore | DEV[LDN] {% endblock %}
+{%block extra_css%}
+<link rel="stylesheet" href="{% static 'core/css/explore.css' %}">
+{% endblock %}
+{% block content %}
+<section class="explore-container">
+    <div>
+        <h1 class="explore-title">
+            <span class="explore-dev">dev</span><span class="explore-path">[ldn]</span> <span class="explore-sub">/ explore</span>
+        </h1>
+
+        <p class="explore-desc">
+            Discover the sections that shape the DEV[LDN] ecosystem.  
+            A growing hub for experiments, projects, posts, and community features.
+        </p>
+
+        <div class="explore-grid">
+
+            <!-- Card 1 -->
+            <a href="/community/" class="explore-card">
+                <h2>Community</h2>
+                <p>Join discussions, share knowledge, and connect with other developers.</p>
+                <span class="status coming">Coming Soon</span>
+            </a>
+
+            <!-- Card 2 -->
+            <a href="/blog/" class="explore-card">
+                <h2>Blog Posts</h2>
+                <p>Write-ups, dev notes, breakdowns, and behind-the-scenes insights.</p>
+                <span class="status">Active</span>
+            </a>
+
+            <!-- Card 3 -->
+            <a href="/portfolio/" class="explore-card">
+                <h2>Portfolio</h2>
+                <p>See the experiments, projects, and builds created inside dev[ldn].</p>
+                <span class="status">Active</span>
+            </a>
+
+            <!-- Card 4 -->
+            <a href="/docs/" class="explore-card">
+                <h2>Documentation</h2>
+                <p>Project docs, architecture notes, and technical breakdowns.</p>
+                <span class="status">Active</span>
+            </a>
+
+            <!-- Card 5 -->
+            <a href="/tools/" class="explore-card">
+                <h2>Tools & Utilities</h2>
+                <p>Small helper apps, experiments, and development utilities.</p>
+                <span class="status coming">Soon</span>
+            </a>
+
+            <!-- Card 6 -->
+            <a href="/roadmap/" class="explore-card">
+                <h2>Roadmap</h2>
+                <p>See upcoming features, experiments, and community goals.</p>
+                <span class="status">Active</span>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

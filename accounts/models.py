@@ -5,6 +5,10 @@ from django.contrib.auth.models import PermissionsMixin
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.utils import timezone
+from config.storage_backends import MinioMediaStorageTesting, MinioMediaStoragePrivateTesting
+
+media_storage = MinioMediaStorageTesting()
+private_media_storage = MinioMediaStoragePrivateTesting()
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -39,6 +43,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     # Auth/identity fields
     email = models.EmailField(unique=True, db_index=True)
+    username = models.CharField(max_length=150, unique=True, null=True, blank=True) # optional username
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
@@ -69,6 +74,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 def user_avatar_upload_to(instance: "Profile", filename: str) -> str:
     return f"avatars/user_{instance.user_id}/{filename}"
 
+def user_file_upload_to(instance: "Profile", filename: str) -> str:
+    return f"invoices/user_{instance.user_id}/{filename}"
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
@@ -80,10 +87,19 @@ class Profile(models.Model):
     language = models.CharField(max_length=32, null=True, blank=True, default="")
 
     avatar = models.ImageField(
+        # storage=media_storage - Not needed as default storage is set in storage backend
         upload_to=user_avatar_upload_to,
         null=True,
         blank=True,
         validators=[FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png", "webp"])],
+    )
+    
+    file = models.FileField(
+        storage=private_media_storage,
+        upload_to=user_file_upload_to,
+        null=True,
+        blank=True,
+        validators=[FileExtensionValidator(allowed_extensions=["pdf", "docx", "txt"])],
     )
 
     website = models.URLField(blank=True)

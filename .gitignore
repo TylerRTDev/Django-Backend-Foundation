@@ -14,3 +14,10 @@ __pycache__/
 .pytest_cache/
 *.sqlite3
 postgres_data/
+.idea/.gitignore
+.idea/Django Test.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/inspectionProfiles/Project_Default.xml

@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>{% block title %} DEV[PATH] {% endblock %} </title>
+        <meta name="description" content="dev[path] – experimental development space built with Django.">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Google fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Rationale&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Goldman:wght@400;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap" rel="stylesheet">
+
+        <!-- Your CSS -->
+        <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+        {% block extra_css %}{% endblock %}
+    </head>
+    <body>
+        <!-- binary background lives here once -->
+        <canvas class="binary-rain" id="binaryRain"></canvas>
+
+
+        <div id="shell">
+            <!-- Optional: top nav with links -->
+            <main id="page-content">
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+
+        <script src="{% static 'core/js/script.js' %}" defer></script>
+        {% comment %} <script src="{% static 'core/js/spa.js' %}" defer></script> {% endcomment %}
+        {% comment %} <script src="https://unpkg.com/htmx.org@2.0.2" defer></script> {% endcomment %}
+    </body>
+</html>

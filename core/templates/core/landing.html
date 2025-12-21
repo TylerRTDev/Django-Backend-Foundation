@@ -1,0 +1,24 @@
+{% extends "core/base.html" %}
+{% block title %} DEV[LDN] {% endblock %}
+{% block content %}
+<section class="hero">
+    <div class="hero-inner">
+        <h1 class="hero-title">
+            <span class="hero-dev">dev</span><span class="hero-path">[ldn]</span>
+        </h1>
+        <h2 class="hero-subtitle">
+            An experimental development space built with Django.
+        </h2>
+
+        <p class="hero-tagline">
+            Craft ideas, test concepts, and explore new architectures without constraints. Designed as a flexible environment for rapid iteration, deeper learning, and building out the kinds of tools that shape your path as a developer.
+        </p>
+
+        <div class="hero-links">
+            <a href="/docs/" class="hero-btn hero-btn--primary">Documentation</a>
+            <a href="/explore/" class="hero-btn">Explore</a>
+            <a href="/admin/" class="hero-btn">Admin Panel</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

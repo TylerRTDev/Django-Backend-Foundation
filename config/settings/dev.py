@@ -1,51 +1,68 @@
 from .base import *
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
-# Default DB is SQLite via base.py; 
-# Override to Postgres for dev environment and Docker setup
+# Default DB is SQLite via base.py Override to Postgres for dev environment and Docker setup
 
 INSTALLED_APPS += [
-    'storages'
+    'storages',
 ]  # for S3/MinIO storage backend
 
 DATABASES = {
     'default': {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("POSTGRES_DB", "language_app_dev"),
-        "USER": config("POSTGRES_USER", "language_app_user"),
+        "NAME": config("POSTGRES_DB", "django_test_db"),
+        "USER": config("POSTGRES_USER"),
         "PASSWORD": config("POSTGRES_PASSWORD", "changeme"),
         "HOST": config("POSTGRES_HOST", "db"),  # Docker service name
         "PORT": config("POSTGRES_PORT", "5432"),
     }
 }
 
-# Storage settings for MinIO (S3-compatible) backend
+# Storage settings for MinIO (S3-compatible) backend (Single Bucket) & Whitenoise for static files
+#
+# 
+#
+# STORAGES = { 
+#     'default': {
+#         'BACKEND': 'config.storage_backends.MinioMediaStorageTesting',
+#     },
+
+#     "staticfiles": {
+#         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+#         "OPTIONS": {},
+#     }
+# }
+
+# Storage configuration to include multiple bucket storage with MinIO and bucket configurations
 
 STORAGES = { 
-    'default': {
-        'BACKEND': 'storages.backends.s3boto3.S3Boto3Storage',
+    "default": {
+        "BACKEND": "config.storage_backends.MinioMediaStorageTesting",
     },
     
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "config.storage_backends.MinioStaticStorageTesting",
+        "OPTIONS": {},
+    },
+    
+    "privatefiles": {
+        "BACKEND": "config.storage_backends.MinioMediaStoragePrivateTesting",
         "OPTIONS": {},
     }
 }
 
+# MinIO specific settings
+
+MINIO_ENDPOINT_INTERNAL = config("MINIO_ENDPOINT_INTERNAL", default="http://minio:9000")
+MINIO_PUBLIC_DOMAIN = config("MINIO_PUBLIC_DOMAIN", default="localhost:9000")
+
 # The ACCESS_KEY and SECRET_KEY are deprecated in favor of MINIO_ROOT_USER and MINIO_ROOT_PASSWORD
 
+AWS_S3_ENDPOINT_URL = MINIO_ENDPOINT_INTERNAL
+AWS_S3_CUSTOM_DOMAIN = MINIO_PUBLIC_DOMAIN
 AWS_S3_ACCESS_KEY_ID = config("AWS_S3_ACCESS_KEY_ID", default="minioadmin")
 AWS_S3_SECRET_ACCESS_KEY = config("AWS_S3_SECRET_ACCESS_KEY", default="minioadmin")
-AWS_S3_ENDPOINT_URL = config("MINIO_ENDPOINT_INTERNAL", default="http://minio:9000")
-AWS_STORAGE_BUCKET_NAME = config("MINIO_BUCKET_NAME", default="somebucket")
-AWS_S3_URL_PROTOCOL = config("AWS_S3_URL_PROTOCOL", default="http:") # http (dev only) or https
-AWS_S3_ADDRESSING_STYLE = config("AWS_S3_ADDRESSING_STYLE", default="path")  # path or virtual http://bucketname/...
-AWS_S3_USE_SSL = config("AWS_S3_USE_SSL", default=False, cast=bool)
-AWS_S3_VERIFY = config("AWS_S3_VERIFY", default=False, cast=bool)  # Whether to verify SSL certificates
-AWS_QUERYSTRING_AUTH = config("AWS_QUERYSTRING_AUTH", default=True, cast=bool) # (False) Public read access; no signed URLs
+AWS_ADDRESSING_STYLE = config("AWS_ADDRESSING_STYLE", default="path")  # 'path' or 'virtual'
+AWS_S3_USE_SSL = False # MinIO in dev uses HTTP
+AWS_S3_VERIFY = False  # Whether to verify SSL certificates
 AWS_S3_REGION_NAME = config("AWS_S3_REGION_NAME", default="eu-west-1")  # arbitrary but consistent
-
-# Media files served from MinIO (Optional; uncomment if needed)
-
-# AWS_S3_CUSTOM_DOMAIN = f"{config('MINIO_PUBLIC_URL')}/{config('MINIO_BUCKET_NAME')}"  # Public URL for accessing media files
-# MEDIA_URL = f"{AWS_S3_URL_PROTOCOL}//{AWS_S3_CUSTOM_DOMAIN}/"
