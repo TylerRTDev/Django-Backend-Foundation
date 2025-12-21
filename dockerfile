@@ -1,4 +1,4 @@
-# Dockerfile
+# Dockerfile capital D
 
 # 1. Base Python image
 FROM python:3.12-slim
