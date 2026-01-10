@@ -79,7 +79,6 @@ def user_file_upload_to(instance: "Profile", filename: str) -> str:
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-
     display_name = models.CharField(max_length=150, blank=True)
     bio = models.TextField(blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
