@@ -1,0 +1,104 @@
+:root {
+    --bg-dark: rgba(0, 0, 0, 0.4);
+    --glass-bg: rgba(10, 12, 20, 0.45);
+    --glass-border: rgba(255, 255, 255, 0.07);
+    --glass-blur: blur(14px);
+
+    --text-main: #e8e8ea;
+    --text-dim: #a3a4b1;
+
+    --green: #5dff7a;
+    --blue: #3da5ff;
+}
+
+body {
+    font-family: "Rationale", sans-serif;
+    margin: 0;
+    padding: 0;
+    color: var(--text-main);
+}
+
+
+/* PAGE WRAPPER */
+.explore-container {
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+    min-height: 100vh;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: clamp(2rem, 5vw, 4rem) 1.5rem;
+    text-align: center;
+}
+
+/* TITLE */
+.explore-sub {
+    text-transform: lowercase;
+}
+
+/* DESCRIPTION */
+.explore-desc {
+    max-width: 620px;
+    margin: 0 auto 3rem;
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+/* GRID */
+.explore-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.7rem;
+}
+
+/* CARD */
+.explore-card {
+    display: block;
+    padding: 1.8rem 1.4rem;
+    border-radius: 20px;
+    text-decoration: none;
+    color: var(--text-main);
+
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+
+    box-shadow: 0 10px 28px rgba(0,0,0,0.55);
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.explore-card h2 {
+    font-size: 0.9rem;
+    margin: 0 0 0.8rem;
+}
+
+.explore-card p {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    line-height: 1.5;
+    margin-bottom: 1.4rem;
+}
+
+/* Status badge */
+.status {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    color: var(--green);
+    border: 1px solid var(--green);
+}
+
+.status.coming {
+    color: #ffa447;
+    border-color: #ffa447;
+}
+
+/* Hover effects */
+.explore-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 32px rgba(0,0,0,0.8);
+    background: rgba(12, 15, 25, 0.6);
+}

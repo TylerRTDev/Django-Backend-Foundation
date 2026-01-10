@@ -19,6 +19,7 @@ from django.conf.urls.static import static
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from accounts.api import MeViewSet
+from core.views import landing_view, explore_view
 
 router = DefaultRouter()
 router.register(r"me", MeViewSet, basename="me")
@@ -26,6 +27,9 @@ router.register(r"me", MeViewSet, basename="me")
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include(router.urls)),
+    path('', landing_view, name='landing'),
+    path('explore/', explore_view, name='explore'),
 ]
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

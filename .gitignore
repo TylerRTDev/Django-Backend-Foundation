@@ -1,17 +1,23 @@
 # Django specific ignores
-/static/ 
 /staticfiles/
 /media/
 /myenv
-# .vscode/settings.json
-# db.sqlite3
-# __pycache__/
+.vscode/settings.json
+db.sqlite3
+__pycache__/
 *.py[cod]
 *.log
 
 # Environments & tooling
 .env
-.env.*        # keep real secrets out of git
+.env.*
 .pytest_cache/
 *.sqlite3
-
+postgres_data/
+.idea/.gitignore
+.idea/Django Test.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/inspectionProfiles/Project_Default.xml
