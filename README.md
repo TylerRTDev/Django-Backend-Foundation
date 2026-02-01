@@ -1,259 +1,120 @@
-# Django Foundation: Custom Users, Profiles, and API Layer
+# Django Systems Learning Lab 🧱🚀
 
-A foundational Django project designed to be a **reusable backend scaffold** for future applications. This setup provides a secure, modular structure that can be extended with new features while maintaining clean separation between authentication, profile management, and data access through APIs.
-
----
+*A reusable, foundational backend project designed to be iterated on and extended into future applications.*
 
 ## 🎯 Project Overview
 
-The goal of this project is to build a **strong Django backend foundation** with a maintainable structure that can support multiple projects over time. The design emphasizes:
+A backend-first Django project built as a **systems learning lab**: the aim is to understand how modern web applications are structured, scaled, and tuned by building the infrastructure layer first (configuration, storage, caching, and delivery) before committing to heavy domain logic.
 
-* **Scalability** – easily add apps or services as your project grows.
-* **Security** – custom authentication and profile management from day one.
-* **Reusability** – minimal configuration required to repurpose this setup for new projects.
-* **Extensibility** – designed for later integration with PostgreSQL, Whitenoise/Cloudflare, and split settings for production environments.
+This repository prioritises:
 
-This foundation allows you to experiment, learn, and expand without redoing boilerplate work every time.
+* **Environment correctness** (clear separation of local/dev and future production settings)
+* **Production-aligned infrastructure patterns** (object storage, caching, CDN concepts)
+* **Performance awareness** (measuring and reducing bottlenecks as the stack evolves)
 
----
+This project is **not a one-size-fits-all blueprint for system design**. Instead, it represents *one well-reasoned approach* based on the use cases being explored here. Real-world architectures vary depending on scale, domain, and constraints.
 
-## ⚙️ Core Features and Concepts
-
-### 1. Custom User Model
-
-Django’s default `User` model uses a username for authentication, which can be restrictive. In this foundation, we replace it with a **custom User model** that uses an email address for login.
-
-**Benefits:**
-
-* Enables **email-based authentication** out of the box.
-* Future-proofs your app — changing the user model later is painful.
-* Allows adding extra fields (e.g., verification status, roles, or permissions) as needed.
-
-### 2. Profile Model
-
-Each user automatically gets a **Profile** via a one-to-one relationship with the User model. The Profile contains user-editable data such as `display_name`, `bio`, `timezone`, `language`, and optional avatar/social fields.
-
-**Benefits:**
-
-* Keeps authentication data (email, permissions) **separate** from personal or public-facing data.
-* Lets you expand user information without cluttering the User model.
-* The separation also aligns with clean database normalization practices.
-
-### 3. Auto Profile Creation via Signals
-
-A `post_save` signal listens for new user creation events and automatically generates a matching Profile.
-
-**Benefits:**
-
-* Prevents null or missing profiles.
-* Ensures that any new user (via admin, registration form, or script) is fully linked to a Profile.
-
-### 4. Admin Customization
-
-The Django Admin interface has been enhanced to display Profile fields inline when editing a User.
-
-**Benefits:**
-
-* Simplifies administration — you can view and edit both User and Profile info in one place.
-* Cleaner, more intuitive workflow for site admins.
-
-### 5. Environment-Based Settings
-
-We use the **`django-environ`** package to manage environment variables from a `.env` file.
-
-**Benefits:**
-
-* Keeps sensitive data (like `SECRET_KEY`) out of version control.
-* Allows you to easily toggle between environments (development, staging, production) without changing the codebase.
-* Follows the **12-factor app** principles for clean configuration management.
-
-Example `.env` variables:
-
-```bash
-SECRET_KEY=dev-dont-use-in-prod
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-DATABASE_URL=sqlite:///db.sqlite3
-DJANGO_SETTINGS_MODULE=config.settings.dev
-```
-
-### 6. Static and Media Files (Current Setup)
-
-Currently, static and media files are handled by Django’s default configuration using SQLite and `DEBUG=True` mode.
-
-**Benefits:**
-
-* Simple for local development.
-* No additional configuration needed for now.
-
-Later, these will be served more efficiently using **Whitenoise** (application-level static file serving) or **Cloudflare CDN** (edge-level caching). In production, **you only need one**—Cloudflare will be the external CDN layer, while Whitenoise can serve as a fallback or local solution.
+> **Note:** The application is intentionally light on “product features” at this stage. The value is in the architecture and the learning path.
 
 ---
 
-## 🧠 API Layer — `/api/me/`
+## 💡 Example Use Cases
 
-The API layer uses **Django REST Framework (DRF)** to provide a small, secure JSON-based endpoint that exposes the currently authenticated user and their profile.
+While this project is intentionally domain-agnostic, the architecture is designed to support several common real-world application patterns once feature logic is layered on.
 
-### Why This Matters
+Typical use cases include:
 
-Even though this project currently uses server-rendered templates, the API layer is what bridges Django’s backend with modern front-end frameworks (React, Vue, mobile apps) or even simple JavaScript widgets.
+* SaaS platforms and dashboards
+* Content-driven or educational platforms
+* API-first backends / backend-for-frontend (BFF)
+* Reusable internal platform foundations
 
-### Endpoint: `/api/me/`
 
-When a logged-in user sends a GET request to `/api/me/`, the API returns a JSON representation of their user and profile data.
-
-**Example Response:**
-
-```json
-[
-  {
-    "id": 1,
-    "email": "example@email.com",
-    "first_name": "Tyler",
-    "last_name": "Dev",
-    "is_verified": false,
-    "profile": {
-      "display_name": "Tyler RT",
-      "bio": "Building cool stuff",
-      "timezone": "Europe/London",
-      "language": "en",
-      "avatar": null,
-      "preferences": {}
-    }
-  }
-]
-```
-
-### How It Works
-
-* **Serializer Layer:** Converts `User` and `Profile` model data into JSON.
-* **ViewSet (`MeViewSet`):** Limits visibility to the authenticated user (`request.user`).
-* **Router Registration:** Maps `/api/me/` to the `MeViewSet` automatically.
-
-### Benefits of Having an API
-
-* **Dynamic UI updates:** Fetch user data (e.g., username, avatar, progress) without a page reload.
-* **Front-end integration:** Connect easily with React/Vue front-ends or mobile apps.
-* **Future-proof:** The same API can power any interface — web, app, or third-party service.
-* **Security:** Only the authenticated user can access their own data.
-
-### Example Use Case — Profile Card
-
-```javascript
-fetch('/api/me/', { credentials: 'include' })
-  .then(res => res.json())
-  .then(([me]) => {
-    document.querySelector('#avatar').src = me.profile.avatar || '/static/default.png';
-    document.querySelector('#username').textContent = me.profile.display_name || me.email;
-    document.querySelector('#bio').textContent = me.profile.bio || 'No bio yet.';
-  });
-```
-
-This snippet can dynamically load a logged-in user’s name and bio into a page element — great for dashboards or sidebars.
+These examples are illustrative rather than prescriptive. The architecture reflects one valid approach among many, chosen to explore scalability, performance, and system design trade-offs in a realistic context.
 
 ---
 
-## 🧪 Testing Setup
+## 🧭 Project Phases
 
-Testing is done using **pytest** and **pytest-django**.
+This project is developed in **explicit phases**, each introducing a specific backend/infrastructure concern. Phases are additive: once introduced, components remain part of the system unless intentionally refactored.
 
-* `pytest.ini` ensures Django’s settings are automatically configured.
-* A basic test confirms that creating a User automatically creates a Profile.
+### Phase 1: Foundational Backend & Configuration *(Complete ✅)*
 
-**Benefits:**
+This phase established the foundation of the Django project, including environment configuration, initial app structure, and baseline dependencies. The goal was to create a clean, modular framework that supports scaling into containerization, database integration, and future feature phases.
 
-* Faster, more readable tests compared to Django’s built-in test runner.
-* Keeps your codebase reliable as you expand.
+### Phase 2: Docker PostgreSQL Setup *(Complete ✅)*
 
-Command:
+This phase introduced the migration from SQLite to a containerized PostgreSQL database using Docker.
+The main goals were stability, scalability, and environment consistency between local and production setup for realistic persistence, schema evolution, and production-aligned behaviour replacing the default SQLite database. 
 
-```bash
-pytest -q
-```
+### Phase 3: MinIO Docker Integration (Testing) + Lightweight Frontend UI Layer *(Complete ✅)*
 
----
+This phase introduces object storage and CDN emulation for handling static and media files outside the Django container. The objective is to separate file storage from the core app via an S3-compatible object storage layer **for local/testing** to mimic production storage semantics. A lightweight UI exists primarily to validate asset delivery and API consumption.
 
-## 🏗️ Project Setup Summary
+### Phase 4: Redis via Docker + DRF Implementation for APIs *(In Progress 🚧)*
 
-1. **Environment variables** control sensitive settings.
-2. **SQLite** is used for local development (PostgreSQL will replace this later).
-3. **Custom User & Profile models** form the base of all future user-related features.
-4. **Admin site** provides one-stop management for users and profiles.
-5. **API layer** allows JSON access to the current user (for web or mobile clients).
-6. **pytest** ensures everything works as expected.
+Introduces Redis to explore caching strategies and performance trade-offs. Expands API structure using Django REST Framework.
 
----
+### Phase 5: Cloudflare CDN (Live) *(Planned ⏳)*
 
-## 📘 Phase 2: Modular Settings and Environment Isolation
+Adds a CDN layer intended for **live deployments** to explore edge caching, asset delivery, and cache invalidation at scale.
 
-### Key Enhancements
+### 🔮 Future Phases (Planned)
 
-* Introduced modular settings system (`base/dev/prod`).
-* Fixed `BASE_DIR` path resolution to project root.
-* Added `DJANGO_SETTINGS_MODULE` to `.env`.
-* Confirmed correct database file placement and migrations.
-* Created standalone troubleshooting guide for configuration imports.
+More phases will be added as the system expands, including (but not limited to):
 
-### Benefits
-
-* Cleaner environment handling (no more mixed settings).
-* Stable database and file path behavior.
-* Ready for Docker integration and PostgreSQL migration in Phase 3.
-
-### Updated Project Structure
-
-```text
-project_root/
-  manage.py
-  config/
-    __init__.py
-    settings/
-      __init__.py
-      base.py
-      dev.py
-      prod.py
-  accounts/
-  static/
-  media/
-  .env
-  .gitignore
-  README.md
-```
-
-### Environment Variables Update
-
-```dotenv
-SECRET_KEY=dev-dont-use-in-prod
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-DATABASE_URL=sqlite:///db.sqlite3
-DJANGO_SETTINGS_MODULE=config.settings.dev
-```
+* Load balancing and reverse proxy strategies
+* CI/CD pipelines and automated testing
+* Performance benchmarking and profiling
+* Staging/production environment parity
+* Observability (logging/metrics/tracing)
 
 ---
 
-## 🔮 Next Steps (Phase 3 Preview)
+## 🏗️ Stack & Architecture Overview
 
-* Add Docker Compose for PostgreSQL.
-* Introduce Whitenoise and Cloudflare CDN integration.
-* Extend DRF for profile editing endpoints.
-* Add modular production security settings.
+### Core stack
+
+* **Backend:** Django + Django REST Framework (DRF)
+* **Database:** PostgreSQL (Docker)
+* **Caching / In-memory:** Redis (Docker)
+* **Object storage (local/testing):** MinIO (Docker, S3-compatible)
+* **CDN (live):** Cloudflare
+* **Containerisation:** Docker / Docker Compose
+* **Frontend:** Lightweight UI layer (primarily for validation, not feature depth)
+
+### Component responsibilities
+
+* **Django/DRF**: request handling, auth, API boundaries, business rules, integration glue
+* **PostgreSQL**: durable persistence for core application data
+* **Redis**: caching experiments to reduce repeated work and improve response times
+* **MinIO (dev/testing)**: production-aligned object storage workflows (buckets, policies, asset URLs)
+* **Cloudflare (live)**: edge caching and delivery layer for production performance
 
 ---
 
-## 🧾 License
+## ⚙️ Project Setup
 
-MIT — free to use, modify, and share.
+> **Placeholder:** A full step-by-step setup guide will be added here.
+>
+> This project is designed to run locally using Docker and environment-specific settings. The development environment is working, while some Docker/deployment refinements are still being iterated on.
 
 ---
 
-## 🧭 Educational Takeaway
+## 📍 Current State
 
-This project isn’t just a starting point — it’s a **learning scaffold** for Django fundamentals:
+* Infrastructure-first foundation is in place (settings isolation, PostgreSQL, MinIO-based object storage testing).
+* The application is intentionally light on domain data and feature depth.
+* APIs are introduced gradually as part of the learning and performance process.
 
-* How to correctly implement a custom user model.
-* Why separating profile data is smart design.
-* How to wire an API securely.
-* How environment-based configuration supports scalable deployment.
+---
 
-Understanding these principles now will save massive time and headaches when projects grow from small experiments into full-scale applications.
+## 🔭 Future Direction
+
+The project will continue expanding into more production-grade concerns, including staging/production environments, load balancing, CI/CD, and structured performance testing.
+
+---
+
+## 👥 Intended Audience
+
+This repository is for developers who want to understand backend architecture and system design by building and iterating on a production-aligned Django stack—rather than focusing purely on application features.
