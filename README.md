@@ -4,7 +4,7 @@
 
 ## 🎯 Project Overview
 
-A backend-first Django project built as a **systems learning lab**: the aim is to understand how modern web applications are structured, scaled, and tuned by building the infrastructure layer first (configuration, storage, caching, and delivery) before committing to heavy domain logic.
+A backend-first Django project built as a **systems learning lab** to understand how modern web applications are structured, scaled, and tuned by building the infrastructure layer first (configuration, storage, caching, and delivery) before committing to heavy domain logic.
 
 This repository prioritises:
 
