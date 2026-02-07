@@ -23,6 +23,8 @@ else
 fi
 echo "Database migrations applied."
 
+python manage.py seed_products
+
 # Execute the command passed as arguments to the script
 echo "Final command: $@" 
 exec "$@"
