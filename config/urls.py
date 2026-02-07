@@ -29,6 +29,7 @@ urlpatterns = [
     path("api/", include(router.urls)),
     path('', landing_view, name='landing'),
     path('explore/', explore_view, name='explore'),
+    path('products/', include('products.urls')),
 ]
 
 if settings.DEBUG:

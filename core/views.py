@@ -5,4 +5,4 @@ def landing_view(request):
     return render(request, 'core/landing.html')
 
 def explore_view(request):
-    return render(request, 'core/explore.html')    
+    return render(request, 'core/explore.html')

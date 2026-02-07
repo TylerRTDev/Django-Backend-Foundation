@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'config',
     'core',
     'accounts',
+    'products',
 ]
 
 AUTH_USER_MODEL = "accounts.User"

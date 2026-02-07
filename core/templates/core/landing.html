@@ -4,7 +4,7 @@
 <section class="hero">
     <div class="hero-inner">
         <h1 class="hero-title">
-            <span class="hero-dev">dev</span><span class="hero-path">[ldn]</span>
+            <a href="/" style="text-decoration: none; color: inherit;"><span class="hero-dev">dev</span><span class="hero-path">[ldn]</span></a> <span class="hero-sub">/ home</span>
         </h1>
         <h2 class="hero-subtitle">
             An experimental development space built with Django.
@@ -16,9 +16,28 @@
 
         <div class="hero-links">
             <a href="/docs/" class="hero-btn hero-btn--primary">Documentation</a>
-            <a href="/explore/" class="hero-btn">Explore</a>
+            <a href="/products/" class="hero-btn">Products</a>
             <a href="/admin/" class="hero-btn">Admin Panel</a>
         </div>
     </div>
 </section>
+{% comment %} <section class="features">
+    <div class="features-inner">
+        <h2 class="features-title">Key Features</h2>
+        <ul class="features-list">
+            <li class="feature-item">
+                <h3 class="feature-title">Rapid Prototyping</h3>
+                <p class="feature-description">Spin up new projects in seconds with our streamlined setup process.</p>
+            </li>
+            <li class="feature-item">
+                <h3 class="feature-title">Modular Architecture</h3>
+                <p class="feature-description">Build and test components in isolation, then integrate them seamlessly.</p>
+            </li>
+            <li class="feature-item">
+                <h3 class="feature-title">Comprehensive Documentation</h3>
+                <p class="feature-description">Access detailed guides, API references, and best practices to accelerate your development.</p>
+            </li>
+        </ul>
+    </div>
+</section> {% endcomment %}
 {% endblock %}

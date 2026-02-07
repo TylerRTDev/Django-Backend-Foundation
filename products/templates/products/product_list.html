@@ -1,0 +1,45 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Products{% endblock %}
+{%block extra_css%}
+<link rel="stylesheet" href="{% static 'products/css/products.css' %}">
+{% endblock %}
+{% block content %}
+<section class="products-container">
+  <h1 class="product-title">
+    <a href="/" style="text-decoration: none; color: inherit;"><span class="product-dev">dev</span><span class="product-path">[ldn]</span></a> <span class="product-sub">/ test.products</span>
+  </h1>
+
+  <p class="product-page-desc">
+    This is a product page designed to complement the implementation of Phase 4 for this project, caching & performance optimizations.<br>...<br> The products listed here are generic items created for testing purposes, allowing evaluation of caching strategies and performance improvements in a realistic context. <br>...<br>Each product card includes a title, description, and a call-to-action to view more details, simulating a typical e-commerce product listing. 
+  </p>
+
+  {% if page_obj.paginator.num_pages > 1 %}
+    <nav aria-label="Pagination">
+      <ul style="display:flex; gap: 8px; list-style:none; padding:0; justify-content:center; align-items:center; margin-top: 2rem; margin-bottom: 2rem;">
+        {% if page_obj.has_previous %}
+          <li><a href="?page={{ page_obj.previous_page_number }}" class="pagination-link">Prev</a></li>
+        {% endif %}
+
+        <li>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</li>
+
+        {% if page_obj.has_next %}
+          <li><a href="?page={{ page_obj.next_page_number }}" class="pagination-link">Next</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+
+  <div class="product-grid">
+    {% for product in page_obj.object_list %}
+        <a href="{% url 'products:product_detail' product.slug %}" class="product-card">
+          <h2 style="text-transform: uppercase; letter-spacing: 0.12rem;">{{ product.name}}</h2>
+          <p>This is a generic item for testing purposes.</p>
+          <span class="product-status">Click for details</span>
+        </a>
+    {% empty %}
+      <p class="no-products" style="font-size: 1.2rem;">No products listed.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
