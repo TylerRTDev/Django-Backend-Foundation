@@ -200,7 +200,7 @@ body {
 
 /* Extra-small screens */
 @media (max-width: 400px) {
-    .hero-title {
+    .hero-title, .explore-title, .features-title, .product-title {
         letter-spacing: 0.08em;
     }
 }
