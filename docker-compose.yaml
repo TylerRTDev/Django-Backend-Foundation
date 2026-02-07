@@ -3,7 +3,7 @@ services:
     image: minio/minio
     env_file:
       - .env
-    container_name: django_test_minio_cdn_server
+    container_name: django_test_minio_object_server
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
@@ -15,6 +15,38 @@ services:
       - "9001:9001"  # Web console
     depends_on:
       - db
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 3s
+      timeout: 2s
+      retries: 30
+
+  minio-mc:
+    image: minio/mc
+    depends_on:
+      - minio
+    env_file:
+      - .env
+    container_name: django_test_minio_mc
+    entrypoint: >
+      /bin/sh -c "
+      echo 'Waiting for MinIO TCP port...';
+      until (echo > /dev/tcp/minio/9000) >/dev/null 2>&1; do
+        sleep 1;
+      done;
+      echo 'MinIO port is open. Setting alias...';
+      until mc alias set local http://minio:9000 \"$MINIO_ACCESS_KEY\" \"$MINIO_SECRET_KEY\"; do
+        sleep 1;
+      done;
+      echo 'Ensuring bucket exists...';
+      mc mb -p local/$MINIO_STATIC_BUCKET_NAME || true;
+      echo 'Setting anonymous download policy...';
+      mc anonymous set download local/$MINIO_STATIC_BUCKET_NAME || true;
+      echo 'MinIO init complete.';
+      "
+    environment:
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
 
   db:
     image: postgres:16
