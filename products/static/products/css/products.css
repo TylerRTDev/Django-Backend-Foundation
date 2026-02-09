@@ -37,7 +37,7 @@
 
 .product-page-desc, .product-desc {
     max-width: 720px;
-    margin: 0 auto 3rem;
+    margin: 0 auto 0;
     color: var(--product-text-main);
     line-height: 1.6;
 }

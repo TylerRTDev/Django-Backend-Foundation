@@ -1,9 +1,6 @@
 {% extends "core/base.html" %}
 {% load static %}
 {% block title %}Products{% endblock %}
-{%block extra_css%}
-<link rel="stylesheet" href="{% static 'products/css/products.css' %}">
-{% endblock %}
 {% block content %}
 <section class="products-container">
   <h1 class="product-title">
@@ -11,7 +8,7 @@
   </h1>
 
   <p class="product-page-desc">
-    This is a product page designed to complement the implementation of Phase 4 for this project, caching & performance optimizations.<br>...<br> The products listed here are generic items created for testing purposes, allowing evaluation of caching strategies and performance improvements in a realistic context. <br>...<br>Each product card includes a title, description, and a call-to-action to view more details, simulating a typical e-commerce product listing. 
+    This is a product test page created for the implementation of the 4th Phase of this project where caching & performance optimization are the goal.<br>...<br> The products listed here are generic items created for testing purposes, allowing evaluation of caching strategies and performance improvements in a realistic context. <br>...<br>Each product card includes a title, description, and a call-to-action to view more details, simulating a typical e-commerce product listing. 
   </p>
 
   {% if page_obj.paginator.num_pages > 1 %}
