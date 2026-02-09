@@ -9,8 +9,8 @@
   <div class="product-card-details" style="display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 2rem; border-radius: 20px; background-color: var(--glass-bg);">
     <h1 style="text-transform: uppercase; letter-spacing: 0.12rem;">{{ product.name }}</h1>
     <div style="display:flex; gap: 1.4rem; align-items: center;">
-      {% if product.image_url %}
-        <img src="{{ product.image_url }}" alt="{{ product.name }} image" style="max-width: 300px;">
+      {% if product.product_img %}
+        <img src="{{ product.product_img.url }}" alt="{{ product.name }} image" style="max-width: 300px;" loading="lazy" />
       {% else %}
       <div style="width: 300px; height: 200px; background-color: var(--glass-bg); border: solid 1px var(--no-image-red); display:flex; align-items:center; justify-content:center; border-radius: 12px;">
         <p>No image available.</p>
