@@ -18,6 +18,18 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+        "LOCATION": "memcached:11211",
+        "OPTIONS": {
+            "connect_timeout": 1,  # fail fast if memcached is not available
+            "timeout": 1,          # short timeout for operations
+            "ignore_exc": True,     # don't raise exceptions if memcached is down
+        },
+    }
+}
+
 # Storage settings for MinIO (S3-compatible) backend (Single Bucket) & Whitenoise for static files
 #
 # 

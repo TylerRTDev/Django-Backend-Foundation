@@ -6,11 +6,12 @@ media_storage = MinioMediaStorageTesting()
 
 def product_image_upload_to(instance: "Product", filename: str) -> str:
     return f"product/{instance.name}/{filename}"
+
 class Product(models.Model):
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True)
     product_img = models.ImageField(
-        storage=media_storage,
+        # storage=media_storage, - using default storage for testing, as MinioMediaStorageTesting is configured as default in settings
         upload_to=product_image_upload_to,
         null=True,
         blank=True,

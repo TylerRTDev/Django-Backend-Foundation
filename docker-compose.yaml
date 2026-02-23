@@ -70,10 +70,18 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  memcached:
+    image: memcached:1.6-alpine
+    container_name: django_test_memcached
+    command: ["memcached", "-m", "128", "-p", "11211", "-vv"]
+    ports:
+      - "11211:11211"
+
+
   web:
     build: .
     container_name: django_test_web_app
-    command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers ${WORKERS} --threads ${THREADS} --timeout ${TIMEOUT}  --access-logfile - --error-logfile - --log-level info # Adjust workers, threads, and timeout as needed for development
     env_file:
       - .env
     environment:

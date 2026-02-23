@@ -10,6 +10,7 @@ __pycache__/
 
 # Environments & tooling
 .env
+.env.k6
 .pytest_cache/
 *.sqlite3
 postgres_data/
