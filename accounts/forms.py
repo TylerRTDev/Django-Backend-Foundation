@@ -11,3 +11,13 @@ class UserNameForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ["first_name", "last_name"]
+
+class EmailLoginForm(forms.Form):
+    email = forms.EmailField(
+        label="Email",
+        widget=forms.EmailInput(attrs={"autocomplete": "email"})
+    )
+    password = forms.CharField(
+        label="Password",
+        widget=forms.PasswordInput(attrs={"autocomplete": "current-password"})
+    )

@@ -1,0 +1,22 @@
+<h1>Login</h1>
+
+<form method="post" action="{% url 'accounts:login' %}">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
+
+  {{ form.non_field_errors }}
+
+  <div>
+    {{ form.email.label_tag }}
+    {{ form.email }}
+    {{ form.email.errors }}
+  </div>
+
+  <div>
+    {{ form.password.label_tag }}
+    {{ form.password }}
+    {{ form.password.errors }}
+  </div>
+
+  <button type="submit">Log in</button>
+</form>
