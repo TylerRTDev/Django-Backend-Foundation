@@ -1,0 +1,174 @@
+/* accounts.css - scoped styling for auth + account pages */
+
+:root {
+    --bg: #05040a;
+    --border: #1d1c2c;
+
+    --auth-red:   #ff4b4b;
+    --auth-blue:  #3da5ff;
+    --auth-green: #5dff7a;
+
+    --text-main: #f5f5f5;
+    --text-dim:  #9a9ab0;
+
+    --btn-bg: #151422;
+    --btn-border: #34324a;
+    --btn-hover: #1f1d33;
+}
+
+.auth {
+  min-height: calc(100vh - 2rem);
+  display: grid;
+  place-items: center;
+  padding: 2rem 1rem;
+}
+
+button {
+  cursor: pointer;
+  font-family: "Rationale", sans-serif;
+  font-size: 1rem;
+}
+
+.auth__card {
+  width: min(560px, 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  /* Keep colors neutral so it sits well on your existing theme */
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+}
+
+.auth__header {
+  margin-bottom: 1.25rem;
+}
+
+.auth__title {
+  margin: 0 0 1.5rem 0;
+  letter-spacing: 0.12rem;
+  font-size: 2.5rem;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.auth-dev {
+  color: var(--title-white);
+}
+
+.auth-path {
+  color: var(--title-green);
+    margin-left: 0.3rem;
+}
+
+.auth-sub {
+  text-transform: lowercase;
+}
+
+.auth__subtitle {
+  margin: 0;
+  opacity: 0.8;
+  text-transform: uppercase;
+  letter-spacing: 0.12rem;
+  text-align: center;
+  padding: 0.25rem 0;
+}
+
+.auth__form {
+  display: grid;
+  gap: 1rem;
+}
+
+.auth__field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.auth__label {
+  font-size: 1.2rem;
+  opacity: 0.9;
+}
+
+.auth__form input[type="email"],
+.auth__form input[type="password"],
+.auth__form input[type="text"] {
+  width: 100%;
+  padding: 0.85rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.35);
+  color: inherit;
+  outline: none;
+}
+
+.auth__form input:focus {
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+}
+
+.auth__button {
+    display: inline-block;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 0.85rem 0.9rem;
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.12);
+    transition: 1s ease-out;
+}
+
+.auth__button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--product-green);
+  border: 1px solid var(--product-green);
+  transition: 0.3s ease-in;
+}
+
+.cancel__button {
+    display: inline-block;
+    font-size: 1rem;
+    padding: 0.85rem 0.9rem;
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.35);
+    border: 1px solid var(--auth-red);
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.12);
+    transition: 1s ease-out;
+}
+
+.cancel__button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--auth-red);
+  border: 1px solid var(--auth-red);
+  transition: 0.3s ease-in;
+}
+
+.auth__alert {
+  border-radius: 12px;
+  padding: 0.85rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.9rem;
+}
+
+.auth__error {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.auth__meta {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  padding-top: 0.25rem;
+}
+
+.auth__hint {
+  font-size: 0.85rem;
+}
+
+.auth__hint--muted {
+  opacity: 0.65;
+}
