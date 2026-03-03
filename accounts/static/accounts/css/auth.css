@@ -30,13 +30,13 @@ button {
 }
 
 .auth__card {
-  width: min(560px, 100%);
+  width: min(360px, 100%);
   border-radius: 16px;
-  padding: 1.5rem;
+  padding: 1rem;
   /* Keep colors neutral so it sits well on your existing theme */
   background: rgba(0, 0, 0, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(5px);
 }
 
 .auth__header {
@@ -46,7 +46,7 @@ button {
 .auth__title {
   margin: 0 0 1.5rem 0;
   letter-spacing: 0.12rem;
-  font-size: 2.5rem;
+  font-size: clamp(1.5rem, 2vw, 2.5rem); /*USE THIS FOR THE LABEL AND SUB*/
   text-transform: uppercase;
   text-align: center;
 }
@@ -61,6 +61,7 @@ button {
 }
 
 .auth-sub {
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
   text-transform: lowercase;
 }
 
@@ -68,6 +69,7 @@ button {
   margin: 0;
   opacity: 0.8;
   text-transform: uppercase;
+  font-size: clamp(1rem, 1vw, 2.5rem);
   letter-spacing: 0.12rem;
   text-align: center;
   padding: 0.25rem 0;
@@ -84,7 +86,7 @@ button {
 }
 
 .auth__label {
-  font-size: 1.2rem;
+  font-size: clamp(0.8rem, 1vw, 1.2rem);
   opacity: 0.9;
 }
 

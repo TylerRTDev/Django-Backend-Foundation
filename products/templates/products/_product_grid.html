@@ -1,0 +1,42 @@
+<!-- Pagination controls -->
+<nav class="pagination"  aria-label="Products pagination">
+  {% if page_obj.has_previous %}
+    <a
+      hx-get="{% url 'products:product_grid' %}?page={{ page_obj.previous_page_number }}"
+      hx-target="#product-grid-container"
+      hx-swap="innerHTML"
+      href="{% url 'products:product_list' %}?page={{ page_obj.previous_page_number }}"
+      class="pagination-link"
+    >
+      ← Prev
+    </a>
+  {% endif %}
+
+  <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+  {% if page_obj.has_next %}
+    <a
+      hx-get="{% url 'products:product_grid' %}?page={{ page_obj.next_page_number }}"
+      hx-target="#product-grid-container"
+      hx-swap="innerHTML"
+      href="{% url 'products:product_list' %}?page={{ page_obj.next_page_number }}"
+      class="pagination-link"
+    >
+      Next →
+    </a>
+  {% endif %}
+</nav>
+
+<div class="product-grid">
+  {% for product in page_obj.object_list %}
+    <a href="{% url 'products:product_detail' product.slug %}" class="product-card">
+      <h2 style="text-transform: uppercase; letter-spacing: 0.12rem;">
+        {{ product.name }}
+      </h2>
+      <p>This is a generic item for testing purposes.</p>
+      <span class="product-status">Click for details</span>
+    </a>
+  {% empty %}
+    <p class="no-products" style="font-size: 1.2rem;">No products listed.</p>
+  {% endfor %}
+</div>

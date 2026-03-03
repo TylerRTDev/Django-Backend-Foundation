@@ -8,10 +8,10 @@
   </h1>
 
   <p class="product-page-desc">
-    This is a product test page created for the implementation of the 4th Phase of this project where caching & performance optimization are the goal.<br>...<br> The products listed here are generic items created for testing purposes, allowing evaluation of caching strategies and performance improvements in a realistic context. <br>...<br>Each product card includes a title, description, and a call-to-action to view more details, simulating a typical e-commerce product listing. 
+    This is a catalogue page that's been implemented as part of the 4th Phase of this project, which focuses on caching & performance optimization.<br>...<br> The products listed here are generic items created for testing purposes, allowing evaluation of caching strategies and performance improvements in a realistic context. <br>...<br>Each product card includes a title, description, and a call-to-action to view more details, simulating a typical e-commerce product listing. 
   </p>
 
-  {% if page_obj.paginator.num_pages > 1 %}
+  {% comment %} {% if page_obj.paginator.num_pages > 1 %}
     <nav aria-label="Pagination">
       <ul style="display:flex; gap: 8px; list-style:none; padding:0; justify-content:center; align-items:center; margin-top: 2rem; margin-bottom: 2rem;">
         {% if page_obj.has_previous %}
@@ -25,9 +25,9 @@
         {% endif %}
       </ul>
     </nav>
-  {% endif %}
+  {% endif %} {% endcomment %}
 
-  <div class="product-grid">
+  {% comment %} <div class="product-grid">
     {% for product in page_obj.object_list %}
         <a href="{% url 'products:product_detail' product.slug %}" class="product-card">
           <h2 style="text-transform: uppercase; letter-spacing: 0.12rem;">{{ product.name}}</h2>
@@ -37,6 +37,9 @@
     {% empty %}
       <p class="no-products" style="font-size: 1.2rem;">No products listed.</p>
     {% endfor %}
+  </div> {% endcomment %}
+  <div id="product-grid-container">
+    {% include "products/_product_grid.html" %}
   </div>
 </section>
 {% endblock %}

@@ -11,6 +11,19 @@
     --no-image-red:   #ff4b4b
 }
 
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.pagination a {
+    text-decoration-line: none;
+}
+
 .products-container, .products-detail-container {
     /* display: flex;
     justify-content: center;
@@ -22,7 +35,15 @@
     text-align: center;
 }
 
-
+.product-title {
+    font-family: "Rationale", sans-serif;
+    font-size: clamp(1.5rem, 3.5vw, 3.5rem);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 0 0 1.6rem;
+    line-height: 1.3;
+    word-break: break-word;
+}
 
 .product-grid {
     display: grid;
@@ -31,12 +52,14 @@
 }
 
 .product-sub {
+    font-size: clamp(1.2rem, 3vw, 2rem);
     text-transform: lowercase;
 }
 
 
 .product-page-desc, .product-desc {
     max-width: 720px;
+    font-size: clamp(0.9rem, 1vw, 1.2rem);
     margin: 0 auto 0;
     color: var(--product-text-main);
     line-height: 1.6;
@@ -48,19 +71,27 @@
     border-radius: 20px;
     text-decoration: none;
     color: var(--product-text-main);
-
     background: var(--glass-bg);
     border: 1px solid var(--product-glass-border);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
-
     box-shadow: 0 10px 28px rgba(0,0,0,0.55);
     transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
 }
 
+.product-card h2 {
+    font-family: "Rationale", sans-serif;
+    font-size: clamp(1.2rem, 1.5vw, 1.8rem);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 0 0 1rem;
+    line-height: 1.3;
+    word-break: break-word;
+}
+
 .product-card p, .no-products {
     color: var(--product-text-dim);
-    font-size: 0.8rem;
+    font-size: clamp(0.8rem, 1vw, 1.1rem);
     line-height: 1.5;
     margin-bottom: 1.4rem;
 }
@@ -69,6 +100,7 @@
     display: inline-block;
     font-size: 0.7rem;
     text-transform: uppercase;
+    text-decoration: none;
     padding: 0.25rem 0.6rem;
     border-radius: 6px;
     color: var(--product-green);
