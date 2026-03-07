@@ -178,10 +178,6 @@ body {
         padding: 2.5rem 1.2rem;
     }
 
-    .hero-inner {
-        text-align: left;
-    }
-
     .hero-tagline {
         max-width: none;
         font-size: 0.88rem;

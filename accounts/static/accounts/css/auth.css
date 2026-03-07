@@ -30,7 +30,7 @@ button {
 }
 
 .auth__card {
-  width: min(360px, 100%);
+  width: min(500px, 100%);
   border-radius: 16px;
   padding: 1rem;
   /* Keep colors neutral so it sits well on your existing theme */
@@ -46,7 +46,7 @@ button {
 .auth__title {
   margin: 0 0 1.5rem 0;
   letter-spacing: 0.12rem;
-  font-size: clamp(1.5rem, 2vw, 2.5rem); /*USE THIS FOR THE LABEL AND SUB*/
+  font-size: clamp(2rem, 2vw, 2.5rem); /*USE THIS FOR THE LABEL AND SUB*/
   text-transform: uppercase;
   text-align: center;
 }
@@ -57,7 +57,7 @@ button {
 
 .auth-path {
   color: var(--title-green);
-    margin-left: 0.3rem;
+  margin-left: 0.3rem;
 }
 
 .auth-sub {

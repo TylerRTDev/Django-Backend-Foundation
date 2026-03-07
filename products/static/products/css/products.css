@@ -37,7 +37,7 @@
 
 .product-title {
     font-family: "Rationale", sans-serif;
-    font-size: clamp(1.5rem, 3.5vw, 3.5rem);
+    font-size: clamp(2rem, 3.5vw, 3.5rem);
     text-transform: uppercase;
     letter-spacing: 0.12em;
     margin: 0 0 1.6rem;

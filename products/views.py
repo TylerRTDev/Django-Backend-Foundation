@@ -32,7 +32,7 @@ def _get_page_obj(request):
     paginator = Paginator(qs, 24)
     return paginator.get_page(request.GET.get("page"))
 
-@dogpile_cache_swr(SWRConfig(ttl=20, lock_ttl=5, stale_grace=30), variant_resolver=htmx_variant)
+@dogpile_cache_swr(SWRConfig(ttl=300, lock_ttl=60, stale_grace=150), variant_resolver=htmx_variant)
 def product_list(request):
     """
     Full page view. Loads the page normally and includes the grid container.
@@ -43,7 +43,7 @@ def product_list(request):
 
 
 # If you want dogpile protection for the fragment endpoint (recommended):
-@dogpile_cache_swr(SWRConfig(ttl=30, lock_ttl=5, stale_grace=30), variant_resolver=htmx_variant)
+@dogpile_cache_swr(SWRConfig(ttl=60, lock_ttl=5, stale_grace=30), variant_resolver=htmx_variant)
 def product_grid(request):
     """
     Fragment view. Returns ONLY the grid markup (plus pagination controls if you want).
@@ -52,7 +52,7 @@ def product_grid(request):
     page_obj = _get_page_obj(request)
     return render(request, "products/_product_grid.html", {"page_obj": page_obj})
 
-
+@dogpile_cache_swr(SWRConfig(ttl=60, lock_ttl=5, stale_grace=30), variant_resolver=htmx_variant)
 def product_detail(request, slug):
     product = get_object_or_404(Product, slug=slug, is_active=True)
     return render(request, "products/product_detail.html", {"product": product})
