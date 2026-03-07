@@ -32,10 +32,28 @@
         <!-- binary background lives here once -->
         <canvas class="binary-rain" id="binaryRain"></canvas>
 
-
         <div id="shell">
             <!-- Optional: top nav with links -->
             <main id="page-content">
+                <nav id="nav">
+                    {% comment %} <div>
+                        <img src="" alt="dev[ldn] logo" id="logo">
+                    </div> {% endcomment %}
+                    <div>
+                        <a href="/" id="nav-home" class="nav-link"><span></span></a>
+                    </div>
+                    <div>
+                        <a href="/products/" id="nav-catalog" class="nav-link"><span></span></a>
+                    </div>
+                    <div>
+                        <a href="/explore/" id="nav-explore" class="nav-link"><span></span></a>
+                    </div>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'accounts:logout' %}" id="nav-logout" class="nav-link"><span></span></a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" id="nav-login" class="nav-link"><span></span></a>
+                    {% endif %}
+                </nav>
                 {% block content %}{% endblock %}
             </main>
         </div>

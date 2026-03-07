@@ -37,6 +37,96 @@ body {
 
 }
 
+nav {
+    display: flex;
+    background: rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(4px);
+    border-radius: 30px;
+    box-shadow: 0 8px 10px rgba(0, 0, 0, 0.55);
+    /* padding: clamp(1rem, 4vw, 3.5rem); */
+    margin: clamp(1rem, 2vw, 4rem) auto;
+    width: fit-content;
+}
+
+nav a {
+    text-decoration: none;
+    display: flex;
+    color: var(--text-dim);
+    font-size: clamp(1.2rem, 3vw, 1.7rem);
+    text-transform: uppercase;
+    padding: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+nav a:hover {
+    color: var(--title-green);
+    text-shadow: 0 0 8px var(--title-green);
+    letter-spacing: 0.15rem;
+    transition: all 0.5s ease;
+}
+
+#nav-home::before {
+    content: "home";
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+#nav-home:hover::before {
+    content: "[ home ]";
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+#nav-catalog::before {
+    content: "catalogue";
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+#nav-catalog:hover::before {
+    content: "[ catalogue ]";
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+#nav-explore::before {
+    content: "explore";
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+#nav-explore:hover::before {
+    content: "[ explore ]";
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+#nav-login::before {
+    content: "login";
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+#nav-login:hover::before {
+    content: "[ login ]";
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+
+#nav-logout::before {
+    content: "logout";
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+#nav-logout:hover::before {
+    content: "[ logout ]";
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
 /* ===== Hero layout ===== */
 
 .binary-rain {
@@ -174,6 +264,9 @@ body {
 
 /* Small screens (phones) */
 @media (max-width: 650px) {
+    nav a {
+        color: var(--text-main);
+    }
     .hero {
         padding: 2.5rem 1.2rem;
     }
