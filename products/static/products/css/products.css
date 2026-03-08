@@ -2,7 +2,7 @@
     --bg-dark: rgba(0, 0, 0, 0.4);
     --glass-bg: rgba(10, 12, 20, 0.45);
     --product-glass-border: rgba(255, 255, 255, 0.07);
-    --glass-blur: blur(14px);
+    --glass-blur: blur(5px);
 
     --product-text-main: #e8e8ea;
     --product-text-dim: #a3a4b1;
@@ -78,13 +78,20 @@
     margin: 0 auto 1.6rem;
 }
 
+.product-card-details img {
+    max-width: 250px;
+    height: auto;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+}
+
 .product-card, .product-card-details {
     display: block;
     padding: 1.8rem 1.4rem;
     border-radius: 20px;
     text-decoration: none;
     color: var(--product-text-main);
-    background: var(--glass-bg);
+    /* background: var(--glass-bg); */
     border: 1px solid var(--product-glass-border);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
