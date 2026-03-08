@@ -4,11 +4,14 @@
 {% block content %}
 <section class="products-container">
   <h1 class="product-title">
-    <a href="/" style="text-decoration: none; color: inherit;"><span class="product-dev">dev</span><span class="product-path">[ldn]</span></a> <span class="product-sub">/ catalogue</span>
+    <a href="/" style="text-decoration: none; color: inherit;"><span class="product-dev">dev</span><span class="product-path">[ldn]</span></a> <span class="product-sub">/catalogue</span>
   </h1>
 
-  <p class="product-page-desc">
-    This is a catalogue page that's been implemented as part of the 4th Phase of this project, which focuses on caching & performance optimization.<br>...<br> The products listed here are generic items created for testing purposes, allowing evaluation of caching strategies and performance improvements in a realistic context. <br>...<br>Each product card includes a title, description, and a call-to-action to view more details, simulating a typical e-commerce product listing. 
+  <h4 class="product-page-desc" id="product-page-sub-heading">
+    " A feature of the 4th phase of this project, which focuses on caching & performance optimization " <br>
+  </h4>
+  <p class="product-page-desc" id="product-page-desc">
+    The products listed here are generic items created for testing purposes, allowing evaluation of caching strategies and performance improvements in a realistic context. <br>...<br>Each product card includes a title, description, and a call-to-action to view more details, simulating a typical e-commerce product listing.
   </p>
 
   {% comment %} {% if page_obj.paginator.num_pages > 1 %}

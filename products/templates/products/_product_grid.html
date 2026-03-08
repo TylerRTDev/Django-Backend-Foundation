@@ -40,3 +40,31 @@
     <p class="no-products" style="font-size: 1.2rem;">No products listed.</p>
   {% endfor %}
 </div>
+
+<nav class="pagination-bottom"  aria-label="Products pagination">
+  {% if page_obj.has_previous %}
+    <a
+      hx-get="{% url 'products:product_grid' %}?page={{ page_obj.previous_page_number }}"
+      hx-target="#product-grid-container"
+      hx-swap="innerHTML"
+      href="{% url 'products:product_list' %}?page={{ page_obj.previous_page_number }}"
+      class="pagination-link"
+    >
+      ← Prev
+    </a>
+  {% endif %}
+
+  <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+  {% if page_obj.has_next %}
+    <a
+      hx-get="{% url 'products:product_grid' %}?page={{ page_obj.next_page_number }}"
+      hx-target="#product-grid-container"
+      hx-swap="innerHTML"
+      href="{% url 'products:product_list' %}?page={{ page_obj.next_page_number }}"
+      class="pagination-link"
+    >
+      Next →
+    </a>
+  {% endif %}
+</nav>

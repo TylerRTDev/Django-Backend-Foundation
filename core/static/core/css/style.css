@@ -1,6 +1,7 @@
 :root {
     --bg: #05040a;
     --border: #1d1c2c;
+    --nav-border: #5dff7a;
 
     --title-red:   #ff4b4b;
     --title-blue:  #3da5ff;
@@ -37,95 +38,98 @@ body {
 
 }
 
-nav {
+.top-nav {
     display: flex;
-    background: rgba(0, 0, 0, 0.08);
+    /* background: rgba(0, 0, 0, 0.08); */
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(4px);
-    border-radius: 30px;
-    box-shadow: 0 8px 10px rgba(0, 0, 0, 0.55);
-    /* padding: clamp(1rem, 4vw, 3.5rem); */
-    margin: clamp(1rem, 2vw, 4rem) auto;
-    width: fit-content;
+    /* box-shadow: 0 8px 10px var(--nav-border); */
+    justify-content: center;
 }
 
-nav a {
+.top-nav a {
     text-decoration: none;
     display: flex;
     color: var(--text-dim);
     font-size: clamp(1.2rem, 3vw, 1.7rem);
-    text-transform: uppercase;
+    text-transform: lowercase;
     padding: 0.5rem;
     transition: all 0.3s ease;
 }
 
-nav a:hover {
+.top-nav a:hover {
     color: var(--title-green);
     text-shadow: 0 0 8px var(--title-green);
     letter-spacing: 0.15rem;
     transition: all 0.5s ease;
 }
 
-#nav-home::before {
+.top-nav #nav-home::before {
     content: "home";
     display: inline-block;
     transition: all 0.3s ease;
 }
 
-#nav-home:hover::before {
+.top-nav #nav-home:hover::before {
     content: "[ home ]";
     display: inline-block;
     transition: all 0.3s ease;
 }
 
-#nav-catalog::before {
+.top-nav #nav-catalog::before {
     content: "catalogue";
     display: inline-block;
     transition: all 0.3s ease;
 }
 
-#nav-catalog:hover::before {
+.top-nav #nav-catalog:hover::before {
     content: "[ catalogue ]";
     display: inline-block;
     transition: all 0.3s ease;
 }
 
-#nav-explore::before {
+.top-nav #nav-explore::before {
     content: "explore";
     display: inline-block;
     transition: all 0.3s ease;
 }
 
-#nav-explore:hover::before {
+.top-nav #nav-explore:hover::before {
     content: "[ explore ]";
     display: inline-block;
     transition: all 0.3s ease;
 }
 
-#nav-login::before {
+.top-nav #nav-login::before {
     content: "login";
     display: inline-block;
     transition: all 0.3s ease;
 }
 
-#nav-login:hover::before {
+.top-nav #nav-login:hover::before {
     content: "[ login ]";
     display: inline-block;
     transition: all 0.3s ease;
 }
 
-
-#nav-logout::before {
+.top-nav #nav-logout::before {
     content: "logout";
+    color: var(--title-red);
     display: inline-block;
     transition: all 0.3s ease;
 }
 
-#nav-logout:hover::before {
+.top-nav #nav-logout:hover::before {
     content: "[ logout ]";
     display: inline-block;
     transition: all 0.3s ease;
 }
+
+.top-nav:active a {
+    letter-spacing: 0;
+    transition: all 0.3s ease;
+}
+
 
 /* ===== Hero layout ===== */
 
@@ -164,15 +168,16 @@ nav a:hover {
 
 /* ===== Heading ===== */
 
-.hero-title, .explore-title, .features-title {
+.hero-title, .explore-title, .product-title, .features-title {
     font-size: clamp(2rem, 6vw, 3.5rem);
+    /* margin: clamp(2rem, 5vw, 4rem) 0 clamp(0.5rem, 17.8vw, 7rem) 0; */
 }
 
 .hero-subtitle {
     font-size: clamp(1.2rem, 3vw, 1.7rem);
 }
 
-.hero-title, .hero-subtitle, .explore-title, .explore-desc, .product-page-desc {
+.hero-title, .hero-subtitle, .explore-desc, .product-page-desc {
     font-family: "Rationale", sans-serif;
     text-transform: uppercase;
     letter-spacing: 0.12em;
@@ -200,7 +205,9 @@ nav a:hover {
 .hero-tagline {
     max-width: 48rem;
     margin: 0 auto 2.4rem;
+    text-transform: uppercase;
     font-size: clamp(0.9rem, 1.2vw, 1rem);
+    letter-spacing: 0.12em;
     line-height: 1.7;
     color: var(--text-dim);
 }
@@ -256,10 +263,6 @@ nav a:hover {
     .hero-inner {
         max-width: 720px;
     }
-
-    .hero-tagline {
-        margin-bottom: 2rem;
-    }
 }
 
 /* Small screens (phones) */
@@ -269,11 +272,6 @@ nav a:hover {
     }
     .hero {
         padding: 2.5rem 1.2rem;
-    }
-
-    .hero-tagline {
-        max-width: none;
-        font-size: 0.88rem;
     }
 
     .hero-links {

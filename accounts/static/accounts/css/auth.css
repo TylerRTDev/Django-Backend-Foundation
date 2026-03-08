@@ -34,8 +34,8 @@ button {
   border-radius: 16px;
   padding: 1rem;
   /* Keep colors neutral so it sits well on your existing theme */
-  background: rgba(0, 0, 0, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  /* background: rgba(0, 0, 0, 0.55); */
+  /* border: 1px solid var(--auth-green); */
   backdrop-filter: blur(5px);
 }
 

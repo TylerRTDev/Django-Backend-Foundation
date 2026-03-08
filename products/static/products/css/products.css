@@ -11,13 +11,17 @@
     --no-image-red:   #ff4b4b
 }
 
-.pagination {
+.pagination, .pagination-bottom {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 0.5rem;
+    margin-top: clamp(2rem, 8vw, 7rem);
+    margin-bottom: clamp(2rem, 5vw, 2rem);
+}
+
+.pagination-bottom {
     margin-top: 2rem;
-    margin-bottom: 2rem;
 }
 
 .pagination a {
@@ -40,7 +44,6 @@
     font-size: clamp(2rem, 3.5vw, 3.5rem);
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    margin: 0 0 1.6rem;
     line-height: 1.3;
     word-break: break-word;
 }
@@ -63,6 +66,16 @@
     margin: 0 auto 0;
     color: var(--product-text-main);
     line-height: 1.6;
+}
+
+#product-page-desc {
+    color: var(--product-text-dim);
+}
+
+#product-page-sub-heading {
+    color: var(--product-text-main);
+    font-size: clamp(1.2rem, 3vw, 1.7rem);
+    margin: 0 auto 1.6rem;
 }
 
 .product-card, .product-card-details {
