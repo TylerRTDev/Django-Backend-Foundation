@@ -12,7 +12,11 @@
     </a>
   {% endif %}
 
-  <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if not page_obj.has_previous and not page_obj.has_next %}
+     <span></span>
+  {% else %}
+     <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% endif %}
 
   {% if page_obj.has_next %}
     <a
@@ -54,7 +58,12 @@
     </a>
   {% endif %}
 
-  <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if not page_obj.has_previous and not page_obj.has_next %}
+     <span></span>
+  {% else %}
+     <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% endif %}
+  {% comment %} <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span> {% endcomment %}
 
   {% if page_obj.has_next %}
     <a
