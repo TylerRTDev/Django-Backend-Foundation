@@ -90,6 +90,13 @@ button {
   opacity: 0.9;
 }
 
+.auth__alert ul li {
+  color: var(--auth-red);
+  list-style-type: disclosure-closed;
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+}
+
 .auth__form input[type="email"],
 .auth__form input[type="password"],
 .auth__form input[type="text"] {
@@ -150,10 +157,18 @@ button {
 .auth__alert {
   border-radius: 12px;
   padding: 0.85rem 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid var(--auth-red);
   background: rgba(255, 255, 255, 0.06);
   font-size: 0.9rem;
 }
+
+.auth__alert ul li, .auth__error ul li {
+  color: var(--auth-red);
+  list-style-type: disclosure-closed;
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+}
+
 
 .auth__error {
   font-size: 0.85rem;
@@ -173,4 +188,53 @@ button {
 
 .auth__hint--muted {
   opacity: 0.65;
+}
+
+/* ===== Undergoing Development ===== */
+
+.ud-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(2rem, 6vw, 4rem) 1.5rem;
+    border-bottom: 1px solid var(--border);
+    z-index: 1;
+}
+
+.ud-heading {
+    font-family: "Rationale", sans-serif;
+    font-size: clamp(2rem, 3vw, 3rem);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    line-height: 1.3;
+    word-break: break-word;
+}
+
+.ud-subtitle {
+  font-size: clamp(1.2rem, 3vw, 1.7rem);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.ud-inner-div {
+    width: 100%;
+    max-width: 960px;
+    text-align: center;
+    padding: clamp(1rem, 4vw, 3.5rem);
+}
+
+.ud-path {
+    color: var(--title-green);
+    margin-left: 0.3rem;
+}
+
+.ud-tagline {
+    max-width: 48rem;
+    margin: 0 auto 2.4rem;
+    text-transform: uppercase;
+    font-size: clamp(0.9rem, 1.2vw, 1rem);
+    letter-spacing: 0.12em;
+    line-height: 1.7;
+    color: var(--text-dim);
 }

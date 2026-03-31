@@ -1,8 +1,22 @@
-<h1>Account</h1>
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Welcome · DEV[LDN]{% endblock %}
+{% block content %}
+<section class="ud-section">
+    <div class="ud-inner-div">
+      <h1 class="ud-heading">
+        <span class="ud-path">[ </span>User Authenticated<span class="ud-path"> ]</span>
+      </h1>
+      {% comment %} <h2 class="ud-subtitle">
+        This project is still in development, stay tuned for updates!
+      </h2> {% endcomment %}
+      <p class="ud-tagline">
+        User: {{ request.user.email }}.
+      </p>
 
-<p>Signed in as: {{ request.user.email }}</p>
-
-<form method="post" action="{% url 'accounts:logout' %}">
-  {% csrf_token %}
-  <button type="submit">Log out</button>
-</form>
+      <p class="ud-tagline">
+        This project is still in development, stay tuned for updates!
+      </p>
+    </div>
+</section>
+{% endblock %}
