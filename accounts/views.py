@@ -58,7 +58,6 @@ def login_view(request: HttpRequest) -> HttpResponse:
 
 
 @never_cache
-@require_POST
 def logout_view(request: HttpRequest) -> HttpResponse:
     auth_logout(request)
     return redirect("accounts:login")

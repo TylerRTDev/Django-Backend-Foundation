@@ -1,8 +1,9 @@
 from .base import *
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 # Default DB is SQLite via base.py Override to Postgres for dev environment and Docker setup
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 
+# For development, allow CSRF from the ngrok domain to enable testing with external tools
 CSRF_TRUSTED_ORIGINS = ['https://festive-lowell-leguminous.ngrok-free.dev']
 
 INSTALLED_APPS += [
