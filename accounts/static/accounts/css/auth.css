@@ -204,7 +204,7 @@ button {
 
 .ud-heading {
     font-family: "Rationale", sans-serif;
-    font-size: clamp(1.5rem, 3vw, 3rem);
+    font-size: clamp(1.2rem, 3vw, 3rem);
     text-transform: uppercase;
     letter-spacing: 0.12em;
     line-height: 1.3;

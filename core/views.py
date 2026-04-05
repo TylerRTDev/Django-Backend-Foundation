@@ -6,3 +6,6 @@ def landing_view(request):
 
 def explore_view(request):
     return render(request, 'core/explore.html')
+
+def temp_view(request):
+    return render(request, 'core/temp.html')
