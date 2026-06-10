@@ -1,0 +1,49 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Login · DEV[LDN]{% endblock %}
+{% block content %}
+<section class="auth">
+  <div class="auth__card">
+    <header class="auth__header">
+      <h1 class="auth__title">
+        <span class="auth-dev">dev</span><span class="auth-path">[ldn]</span> <span class="auth-sub">/login</span>
+      </h1>
+      <h2 class="auth__subtitle">Welcome Back!</h2>
+    </header>
+
+    <form class="auth__form" method="post" action="{% url 'accounts:login' %}" novalidate>
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+
+      {% if form.non_field_errors %}
+        <div class="auth__alert" role="alert">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
+      <div class="auth__field">
+        <label class="auth__label" for="{{ form.email.id_for_label }}">Email:</label>
+        {{ form.email }}
+        {% if form.email.errors %}
+          <div class="auth__error">{{ form.email.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="auth__field">
+        <label class="auth__label" for="{{ form.password.id_for_label }}">Password:</label>
+        {{ form.password }}
+        {% if form.password.errors %}
+          <div class="auth__error">{{ form.password.errors }}</div>
+        {% endif %}
+      </div>
+
+      <button class="auth__button" type="submit">Sign In</button>
+
+      <div class="auth__meta">
+        <span class="auth__hint">Forgot password?</span>
+        <span class="auth__hint auth__hint--muted">(Coming soon)</span>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

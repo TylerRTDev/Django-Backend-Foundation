@@ -1,0 +1,189 @@
+/* Account page layout */
+
+:root {
+    --bg: #05040a;
+    --border: #1d1c2c;
+
+    --acc-red:   #ff4b4b;
+    --acc-blue:  #3da5ff;
+    --acc-green: #5dff7a;
+
+    --text-main: #f5f5f5;
+    --text-dim:  #9a9ab0;
+
+    --btn-bg: #151422;
+    --btn-border: #34324a;
+    --btn-hover: #1f1d33;
+}
+
+button {
+  cursor: pointer;
+  font-family: "Rationale", sans-serif;
+  font-size: 1rem;
+}
+
+.account {
+  padding: 2rem 1rem;
+}
+
+.account__title_header {
+  /* margin: 0 0 1.5rem 0; */
+  letter-spacing: 0.12rem;
+  text-transform: uppercase;
+  text-align: left;
+}
+
+.account__title_edit {
+  margin: 0 0 1.5rem 0;
+  letter-spacing: 0.12rem;
+  font-size: 2.5rem;
+  text-transform: uppercase;
+  text-align: left;
+}
+
+.account__title_span {
+  color: var(--acc-green);
+}
+
+.account__wrap {
+  width: min(980px, 100%);
+  margin: 0 auto;
+}
+
+.account__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.account__title {
+  margin: 0 0 0.35rem 0;
+  letter-spacing: 0.12rem;
+}
+
+.account__subtitle {
+  margin: 0;
+  opacity: 0.8;
+}
+
+.account__actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.account__btn {
+  display: inline-block;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.85rem 0.9rem;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.12);
+  transition: 1s ease-out;
+}
+
+.account__btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--acc-green);
+  border: 1px solid var(--acc-green);
+  transition: 0.3s ease-in;
+}
+
+.account__btn_logout {
+  display: inline-block;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.85rem 0.9rem;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.35);
+  border: 1px solid var(--acc-red);
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.12);
+  transition: 1s ease-out;
+}
+
+.account__btn_logout:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--acc-red);
+  border: 1px solid var(--acc-red);
+  transition: 0.3s ease-in;
+}
+
+.account__btn--secondary {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.account__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 900px) {
+  .account__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.account__card {
+  border-radius: 16px;
+  padding: 1.25rem;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(10px);
+}
+
+.account__card--split {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  grid-column: 1 / -1;
+}
+
+.account__cardTitle {
+  margin: 0 0 0.65rem 0;
+  letter-spacing: 0.06rem;
+  text-transform: uppercase;
+}
+
+.account__text {
+  margin: 0;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+.account__text--muted {
+  opacity: 0.65;
+}
+
+.account__text--bio {
+  white-space: pre-wrap;
+}
+
+.account__hint {
+  margin: 0.75rem 0 0 0;
+  opacity: 0.65;
+}
+
+.account__stack {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: end;
+}
+
+/* Edit profile buttons row */
+.auth__actionsRow {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.auth__button--ghost {
+  background: transparent;
+}

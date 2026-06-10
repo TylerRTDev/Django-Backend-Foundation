@@ -1,0 +1,20 @@
+{% extends "core/base.html" %}
+{% load static %}
+{% block title %}Welcome · DEV[LDN]{% endblock %}
+{% block content %}
+<section class="ud-section">
+    <div class="ud-inner-div">
+      <h1 class="ud-heading">
+        <span class="ud-path">[ </span>User Authenticated<span class="ud-path"> ]</span>
+      </h1>
+      {% comment %} <h2 class="ud-subtitle">
+        This project is still in development, stay tuned for updates!
+      </h2> {% endcomment %}
+      <p class="ud-tagline">
+        User: {{ request.user.email }}.
+      </p>
+
+      <a href="/temp" class="ud-hero-btn">Profile</a>
+    </div>
+</section>
+{% endblock %}

@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from accounts.api import MeViewSet
-from core.views import landing_view, explore_view
+from core.views import landing_view, explore_view, temp_view
 
 router = DefaultRouter()
 router.register(r"me", MeViewSet, basename="me")
@@ -28,7 +28,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include(router.urls)),
     path('', landing_view, name='landing'),
+    path("", include("accounts.urls", namespace="accounts")),
     path('explore/', explore_view, name='explore'),
+    path('products/', include('products.urls')),
+    path('temp/', temp_view, name='temp'),
 ]
 
 if settings.DEBUG:

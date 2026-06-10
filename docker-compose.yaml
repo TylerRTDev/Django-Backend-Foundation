@@ -34,14 +34,22 @@ services:
       until (echo > /dev/tcp/minio/9000) >/dev/null 2>&1; do
         sleep 1;
       done;
+
       echo 'MinIO port is open. Setting alias...';
       until mc alias set local http://minio:9000 \"$MINIO_ACCESS_KEY\" \"$MINIO_SECRET_KEY\"; do
         sleep 1;
       done;
+
       echo 'Ensuring bucket exists...';
+
       mc mb -p local/$MINIO_STATIC_BUCKET_NAME || true;
       echo 'Setting anonymous download policy...';
       mc anonymous set download local/$MINIO_STATIC_BUCKET_NAME || true;
+
+      mc mb -p local/$MINIO_MEDIA_BUCKET_NAME || true;
+      echo 'Setting anonymous download policy for pubmedia...';
+      mc anonymous set download local/$MINIO_MEDIA_BUCKET_NAME || true;
+
       echo 'MinIO init complete.';
       "
     environment:
@@ -62,10 +70,28 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  memcached:
+    image: memcached:1.6-alpine
+    container_name: django_test_memcached
+    command: ["memcached", "-m", "128", "-p", "11211", "-vv"]
+    ports:
+      - "11211:11211"
+
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: django_test_redis
+  #   ports:
+  #     - "127.0.0.1:6379:6379"
+  #   depends_on:
+  #     - web
+  #   volumes:
+  #     - redis_data:/data
+  #   restart: unless-stopped
+
   web:
     build: .
     container_name: django_test_web_app
-    command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers ${WORKERS} --threads ${THREADS} --timeout ${TIMEOUT}  --access-logfile - --error-logfile - --log-level info # Adjust workers, threads, and timeout as needed for development
     env_file:
       - .env
     environment:
@@ -80,3 +106,4 @@ services:
 volumes:
   postgres_data:
   minio_data:
+  # redis_data:

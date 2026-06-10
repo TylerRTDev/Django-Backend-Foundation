@@ -4,8 +4,8 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>{% block title %} DEV[PATH] {% endblock %} </title>
-        <meta name="description" content="dev[path] – experimental development space built with Django.">
+        <title>{% block title %} DEV[LDN] {% endblock %} </title>
+        <meta name="description" content="dev[ldn] – experimental development space built with Django.">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <!-- Google fonts -->
@@ -18,19 +18,65 @@
 
         <!-- Your CSS -->
         <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+        <link rel="stylesheet" href="{% static 'core/css/explore.css' %}">
+        <link rel="stylesheet" href="{% static 'products/css/products.css' %}">
+        <link rel="stylesheet" href="{% static 'accounts/css/auth.css' %}">
+        <link rel="stylesheet" href="{% static 'accounts/css/accounts.css' %}">
+
+        <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+
+
         {% block extra_css %}{% endblock %}
     </head>
     <body>
         <!-- binary background lives here once -->
         <canvas class="binary-rain" id="binaryRain"></canvas>
 
-
         <div id="shell">
             <!-- Optional: top nav with links -->
             <main id="page-content">
+                <nav id="top-nav" class="top-nav">
+                    {% comment %} <div>
+                        <img src="" alt="dev[ldn] logo" id="logo">
+                    </div> {% endcomment %}
+                    <div>
+                        <a href="/" id="nav-home" class="nav-link"><span></span></a>
+                    </div>
+                    <div>
+                        <a href="/products/" id="nav-catalog" class="nav-link"><span></span></a>
+                    </div>
+                    <div>
+                        <a href="/explore/" id="nav-explore" class="nav-link"><span></span></a>
+                    </div>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'accounts:logout' %}" id="nav-logout" class="nav-link"><span></span></a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" id="nav-login" class="nav-link"><span></span></a>
+                    {% endif %}
+                </nav>
                 {% block content %}{% endblock %}
             </main>
         </div>
+
+        <footer class="footer-container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <p>DEV<span class="temp-hero-path">[LDN]</span> © 2026. All rights reserved.</p>
+                </div>
+                <div class="footer-links mt-1 mb-2">
+                    <div class="social-icons-container">
+                        <a href="https://www.facebook.com/profile.php?id=61570549830925" target="_blank" rel="noopener"><img src="/static/core/resources/icons/facebook.svg" alt="Facebook"></a>
+                        <a href="https://x.com/TylerRTDev" target="_blank" rel="noopener"><img src="/static/core/resources/icons/x-social.svg" alt="Twitter"></a>
+                        <a href="https://www.instagram.com/tylerrtdev/" target="_blank" rel="noopener"><img src="/static/core/resources/icons/instagram.svg" alt="Instagram"></a>
+                        <a href="https://www.youtube.com" target="_blank" rel="noopener"><img src="/static/core/resources/icons/youtube.svg" alt="YouTube"></a>
+                        <a href="https://github.com/TylerRTDev" target="_blank" rel="noopener"><img src="/static/core/resources/icons/github-svgrepo-com.svg" alt="Git-Hub"></a>
+                    </div>
+                </div>
+                <div class="footer-text">
+                    <p>Built by TylerRTDev</p>
+                </div>
+            </div>
+        </footer>
 
         <script src="{% static 'core/js/script.js' %}" defer></script>
         {% comment %} <script src="{% static 'core/js/spa.js' %}" defer></script> {% endcomment %}

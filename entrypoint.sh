@@ -21,7 +21,9 @@ else
   echo "Running migrate..."
   python manage.py migrate --noinput
 fi
-echo "Database migrations applied."
+echo "Database migrations complete."
+
+python manage.py seed_products
 
 # Execute the command passed as arguments to the script
 echo "Final command: $@" 

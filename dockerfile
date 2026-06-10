@@ -37,6 +37,3 @@ RUN chmod +x /entrypoint.sh
 
 # 10. Set entrypoint to the entrypoint script
 ENTRYPOINT ["/entrypoint.sh"]
-
-# 11. Default command to run the Django development server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]

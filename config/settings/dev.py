@@ -1,7 +1,10 @@
 from .base import *
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 # Default DB is SQLite via base.py Override to Postgres for dev environment and Docker setup
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
+
+# For development, allow CSRF from the ngrok domain to enable testing with external tools
+CSRF_TRUSTED_ORIGINS = ['https://festive-lowell-leguminous.ngrok-free.dev']
 
 INSTALLED_APPS += [
     'storages',
@@ -16,6 +19,30 @@ DATABASES = {
         "HOST": config("POSTGRES_HOST", "db"),  # Docker service name
         "PORT": config("POSTGRES_PORT", "5432"),
     }
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.memcached.PyMemcacheCache",
+        "LOCATION": "memcached:11211",
+        "OPTIONS": {
+            "connect_timeout": 1,  # fail fast if memcached is not available
+            "timeout": 1,          # short timeout for operations
+            "ignore_exc": True,     # don't raise exceptions if memcached is down
+        },
+    },
+    
+    # "redis": {
+    #     "BACKEND": "django_redis.cache.RedisCache",
+    #     "LOCATION": config('REDIS_URL'),
+    #     "OPTIONS": {
+    #         "CLIENT_CLASS": "django_redis.client.DefaultClient",
+    #         "SOCKET_CONNECT_TIMEOUT": 1,  # fail fast if Redis is not available
+    #         "SOCKET_TIMEOUT": 1,          # short timeout for operations
+    #         "IGNORE_EXCEPTIONS": True,     # don't raise exceptions if Redis is down
+    #     },
+    #     "TIMEOUT": 3600,  # short timeout for cache operations
+    # }
 }
 
 # Storage settings for MinIO (S3-compatible) backend (Single Bucket) & Whitenoise for static files
@@ -53,8 +80,8 @@ STORAGES = {
 
 # MinIO specific settings
 
-MINIO_ENDPOINT_INTERNAL = config("MINIO_ENDPOINT_INTERNAL", default="http://minio:9000")
-MINIO_PUBLIC_DOMAIN = config("MINIO_PUBLIC_DOMAIN", default="localhost:9000")
+MINIO_ENDPOINT_INTERNAL = config("MINIO_ENDPOINT_INTERNAL")
+MINIO_PUBLIC_DOMAIN = config("MINIO_PUBLIC_DOMAIN")
 
 # The ACCESS_KEY and SECRET_KEY are deprecated in favor of MINIO_ROOT_USER and MINIO_ROOT_PASSWORD
 
