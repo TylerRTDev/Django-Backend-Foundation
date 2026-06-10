@@ -77,6 +77,16 @@ services:
     ports:
       - "11211:11211"
 
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: django_test_redis
+  #   ports:
+  #     - "127.0.0.1:6379:6379"
+  #   depends_on:
+  #     - web
+  #   volumes:
+  #     - redis_data:/data
+  #   restart: unless-stopped
 
   web:
     build: .
@@ -96,3 +106,4 @@ services:
 volumes:
   postgres_data:
   minio_data:
+  # redis_data:

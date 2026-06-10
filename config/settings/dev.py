@@ -30,7 +30,19 @@ CACHES = {
             "timeout": 1,          # short timeout for operations
             "ignore_exc": True,     # don't raise exceptions if memcached is down
         },
-    }
+    },
+    
+    # "redis": {
+    #     "BACKEND": "django_redis.cache.RedisCache",
+    #     "LOCATION": config('REDIS_URL'),
+    #     "OPTIONS": {
+    #         "CLIENT_CLASS": "django_redis.client.DefaultClient",
+    #         "SOCKET_CONNECT_TIMEOUT": 1,  # fail fast if Redis is not available
+    #         "SOCKET_TIMEOUT": 1,          # short timeout for operations
+    #         "IGNORE_EXCEPTIONS": True,     # don't raise exceptions if Redis is down
+    #     },
+    #     "TIMEOUT": 3600,  # short timeout for cache operations
+    # }
 }
 
 # Storage settings for MinIO (S3-compatible) backend (Single Bucket) & Whitenoise for static files
