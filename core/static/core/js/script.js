@@ -13,12 +13,12 @@ const binary = "010";
 const binaryChars = binary.split("");
 const particles = [];
 // Adjust number of particles based on screen size
-let maxParticles = 350;
+let maxParticles = 450;
 
 if (window.innerWidth < 800) {
-    maxParticles = 400;
+    maxParticles = 250;
 } else if (window.innerWidth < 1200) {
-    maxParticles;
+    maxParticles = 450;
 }
 
 class BinaryParticle {
@@ -128,14 +128,3 @@ setInterval(() => {
         }, 50);
     }
 }, 8000);
-
-document.addEventListener('DOMContentLoaded', function() {
-    const terminal = document.querySelector('.terminal-window');
-    terminal.style.opacity = '0';
-    terminal.style.transform = 'translateY(20px)';
-    setTimeout(() => {
-        terminal.style.transition = 'all 1s ease';
-        terminal.style.opacity = '1';
-        terminal.style.transform = 'translateY(0)';
-    }, 500);
-});

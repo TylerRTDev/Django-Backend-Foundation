@@ -27,9 +27,9 @@ class MinioMediaStorageTesting(S3Boto3Storage):
         super().__init__(*args, **kwargs)
     location = ""
     default_acl = "public-read" # or "private" if you want to restrict access
-    file_overwrite = False  # keep originals by default
-    custom_domain = None    # we’ll use endpoint URL in MEDIA_URL
-    querystring_auth = False  # public read, no need for query params. Set to (True) for private files
+    file_overwrite = False # keep originals by default
+    custom_domain = None # we’ll use endpoint URL in MEDIA_URL
+    querystring_auth = False # public read, no need for query params. Set to (True) for private files
     
 class MinioMediaStoragePrivateTesting(S3Boto3Storage):
     """
@@ -40,7 +40,7 @@ class MinioMediaStoragePrivateTesting(S3Boto3Storage):
         kwargs.setdefault("bucket_name", config("MINIO_PRIVATE_MEDIA_BUCKET_NAME", default="prvmedia"))
         super().__init__(*args, **kwargs)
     location = ""
-    default_acl = "private" # or "private" if you want to restrict access
+    default_acl = "private" # or "public-read" if you want to allow public access
     file_overwrite = False  # keep originals by default
-    custom_domain = None    # we’ll use endpoint URL in MEDIA_URL
-    querystring_auth = True  # public read, no need for query params. Set to (True) for private files
+    custom_domain = None # we’ll use endpoint URL in MEDIA_URL
+    querystring_auth = True  # private files need query params for authentication
