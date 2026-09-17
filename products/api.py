@@ -38,11 +38,11 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     pagination_class = ProductPagination
     lookup_field = "slug"
 
-    @dogpile_cache_drf(DogpileConfig(ttl=60, lock_ttl=10, key_prefix="dogpile:api:products:list"))
+    @dogpile_cache_drf(DogpileConfig(ttl=60, lock_ttl=10, key_prefix="dogpile:api:products:list", cache_authenticated=True))
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
-    @dogpile_cache_drf(DogpileConfig(ttl=120, lock_ttl=15, key_prefix="dogpile:api:products:detail"))
+    @dogpile_cache_drf(DogpileConfig(ttl=120, lock_ttl=15, key_prefix="dogpile:api:products:detail", cache_authenticated=True))
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
