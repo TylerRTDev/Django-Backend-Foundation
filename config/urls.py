@@ -19,10 +19,13 @@ from django.conf.urls.static import static
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from accounts.api import MeViewSet
+from products.api import ProductViewSet, QuoteViewSet
 from core.views import landing_view, explore_view, temp_view
 
 router = DefaultRouter()
 router.register(r"me", MeViewSet, basename="me")
+router.register(r"products", ProductViewSet, basename="products")
+router.register(r"quotes", QuoteViewSet, basename="quotes")
 
 urlpatterns = [
     path('admin/', admin.site.urls),

@@ -17,8 +17,11 @@
       </div>
       {% endif %}
     </div>
-      {% if product.description %}
-        <p class="product-desc" style="text-transform: uppercase; letter-spacing: 0.12rem; margin-top: 2rem;">{{ product.description }}</p>
+      {% if quote %}
+        <blockquote style="margin-top: 2rem; font-style: italic; text-align: center; padding: 1rem; border-left: 3px solid var(--glass-bg);">
+          <p>&ldquo;{{ quote.content }}&rdquo;</p>
+          <footer style="margin-top: 0.5rem; font-size: 0.85rem;">&mdash; {{ quote.author }}</footer>
+        </blockquote>
       {% endif %}
   </div>
 </section>
