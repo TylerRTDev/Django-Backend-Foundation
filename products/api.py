@@ -2,16 +2,49 @@ import urllib3
 import requests
 from rest_framework import viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 
-from .serializers import QuoteSerializer
+from core.cache_dogpile import DogpileConfig
+from core.cache_dogpile_drf import dogpile_cache_drf
+
+from .models import Product
+from .serializers import QuoteSerializer, ProductSerializer
 
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 QUOTABLE_API = "https://api.quotable.io"
+
+
+class ProductPagination(PageNumberPagination):
+    page_size = 24
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+
+class ProductViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Public catalogue endpoint. Read-only, paginated, cached.
+
+    API-level dogpile caching prevents cache stampede on TTL expiry.
+    Key prefix isolated from view-level cache via "dogpile:api:...".
+    """
+    queryset = Product.objects.filter(is_active=True).order_by("-created_at", "-id")
+    serializer_class = ProductSerializer
+    permission_classes = [AllowAny]
+    pagination_class = ProductPagination
+    lookup_field = "slug"
+
+    @dogpile_cache_drf(DogpileConfig(ttl=60, lock_ttl=10, key_prefix="dogpile:api:products:list", cache_authenticated=True))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @dogpile_cache_drf(DogpileConfig(ttl=120, lock_ttl=15, key_prefix="dogpile:api:products:detail", cache_authenticated=True))
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
 
 
 class QuoteViewSet(viewsets.ViewSet):
