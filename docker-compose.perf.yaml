@@ -12,13 +12,12 @@ services:
   k6:
     image: grafana/k6:latest
     container_name: django_test_k6
+    entrypoint: ["sh", "-c", "k6 run --out experimental-prometheus-rw /scripts/smoke.js"]
     volumes:
       - ./scripts/k6:/scripts
       - ./Memcache Unconfigured Cache Resutls:/results
     environment:
       BASE_URL: http://web:8000
-      K6_SCRIPT: /scripts/smoke.js
-    command: run --out output-prometheus-remotewrite=http://prometheus:9090/api/v1/write $${K6_SCRIPT}
+      K6_PROMETHEUS_RW_SERVER_URL: http://prometheus:9090/api/v1/write
     depends_on:
       - web
-      - prometheus
