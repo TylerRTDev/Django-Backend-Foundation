@@ -1,50 +1,37 @@
 {
-  "title": "Container Resource Overview",
-  "description": "Container-level CPU, memory, network, and disk metrics during benchmark runs",
+  "title": "Performance Test Dashboard",
+  "description": "Live benchmark metrics: container resources, cache performance, k6 load test results with percentile filtering",
   "schemaVersion": 38,
-  "version": 1,
+  "version": 2,
   "time": {
     "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
-  "tags": ["monitoring", "docker", "benchmark"],
+  "tags": ["monitoring", "docker", "benchmark", "k6", "cache"],
   "panels": [
     {
       "id": 1,
       "title": "CPU Usage (by container)",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Prometheus"
-      },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
           "decimals": 2,
           "min": 0,
           "max": 1,
-          "custom": {
-            "displayMode": "table",
-            "stacking": { "mode": "normal" },
-            "fillOpacity": 30
-          }
-        },
-        "overrides": []
+          "custom": { "stacking": { "mode": "normal" }, "fillOpacity": 30 }
+        }
       },
       "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        }
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true }
       },
       "targets": [
         {
           "expr": "sum(rate(container_cpu_usage_seconds_total{name!=\"\"}[30s])) by (name)",
           "legendFormat": "{{ name }}",
-          "interval": "",
           "refId": "A"
         }
       ]
@@ -54,134 +41,211 @@
       "title": "Memory Usage (by container)",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Prometheus"
-      },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "fieldConfig": {
         "defaults": {
           "unit": "bytes",
           "decimals": 1,
-          "custom": {
-            "stacking": { "mode": "normal" },
-            "fillOpacity": 30
-          }
-        },
-        "overrides": []
+          "custom": { "stacking": { "mode": "normal" }, "fillOpacity": 30 }
+        }
       },
       "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        }
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true }
       },
       "targets": [
         {
           "expr": "container_memory_usage_bytes{name!=\"\"}",
           "legendFormat": "{{ name }}",
-          "interval": "",
           "refId": "A"
         }
       ]
     },
     {
       "id": 3,
-      "title": "Network Receive (by container)",
+      "title": "Cache Hit Rate",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Prometheus"
-      },
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "fieldConfig": {
         "defaults": {
-          "unit": "Bps",
-          "decimals": 1,
-          "custom": {
-            "fillOpacity": 20
-          }
-        },
-        "overrides": []
+          "unit": "percentunit",
+          "decimals": 3,
+          "min": 0,
+          "max": 1,
+          "custom": { "fillOpacity": 30 }
+        }
       },
       "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        }
+        "legend": { "displayMode": "hidden" }
       },
       "targets": [
         {
-          "expr": "rate(container_network_receive_bytes_total{name!=\"\"}[30s])",
-          "legendFormat": "{{ name }}",
-          "interval": "",
+          "expr": "rate(memcached_get_hits_total[30s]) / (rate(memcached_get_hits_total[30s]) + rate(memcached_get_misses_total[30s]))",
+          "legendFormat": "Hit Rate",
           "refId": "A"
         }
       ]
     },
     {
       "id": 4,
-      "title": "Network Transmit (by container)",
+      "title": "Cache Current Items",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Prometheus"
-      },
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "fieldConfig": {
         "defaults": {
-          "unit": "Bps",
-          "decimals": 1,
-          "custom": {
-            "fillOpacity": 20
-          }
-        },
-        "overrides": []
+          "decimals": 0,
+          "custom": { "fillOpacity": 30 }
+        }
       },
       "options": {
-        "legend": {
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        }
+        "legend": { "displayMode": "hidden" }
       },
       "targets": [
         {
-          "expr": "rate(container_network_transmit_bytes_total{name!=\"\"}[30s])",
-          "legendFormat": "{{ name }}",
-          "interval": "",
+          "expr": "memcached_current_items",
+          "legendFormat": "Items",
           "refId": "A"
         }
       ]
     },
     {
       "id": 5,
-      "title": "Filesystem Usage (by container)",
-      "type": "table",
-      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "Prometheus"
-      },
+      "title": "Cache Evictions",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "fieldConfig": {
         "defaults": {
-          "unit": "bytes",
-          "decimals": 1,
-          "custom": {
-            "displayMode": "table"
-          }
-        },
-        "overrides": []
+          "custom": { "fillOpacity": 20 }
+        }
       },
       "options": {
-        "sortBy": []
+        "legend": { "displayMode": "hidden" }
       },
       "targets": [
         {
-          "expr": "container_fs_usage_bytes{name!=\"\"}",
+          "expr": "rate(memcached_evictions_total[30s])",
+          "legendFormat": "Evictions/s",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Request Rate (RPS)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "rps",
+          "decimals": 1,
+          "custom": { "fillOpacity": 20 }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(k6_http_reqs_total[30s])) by (name)",
           "legendFormat": "{{ name }}",
-          "interval": "",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Active VUs",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "decimals": 0,
+          "custom": { "fillOpacity": 30 }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true }
+      },
+      "targets": [
+        {
+          "expr": "k6_vus",
+          "legendFormat": "VUs",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Response Time (p50 / p90 / p95 / p99)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 3,
+          "custom": { "fillOpacity": 10 }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true }
+      },
+      "targets": [
+        { "expr": "k6_http_req_duration_seconds{quantile=\"0.5\"}", "legendFormat": "p50 {{ name }}", "refId": "A" },
+        { "expr": "k6_http_req_duration_seconds{quantile=\"0.9\"}", "legendFormat": "p90 {{ name }}", "refId": "B" },
+        { "expr": "k6_http_req_duration_seconds{quantile=\"0.95\"}", "legendFormat": "p95 {{ name }}", "refId": "C" },
+        { "expr": "k6_http_req_duration_seconds{quantile=\"0.99\"}", "legendFormat": "p99 {{ name }}", "refId": "D" }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "HTTP Request Breakdown (p95)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 4,
+          "custom": { "fillOpacity": 20 }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true }
+      },
+      "targets": [
+        { "expr": "k6_http_req_waiting_seconds{quantile=\"0.95\"}", "legendFormat": "waiting (TTFB) {{ name }}", "refId": "A" },
+        { "expr": "k6_http_req_sending_seconds{quantile=\"0.95\"}", "legendFormat": "sending {{ name }}", "refId": "B" },
+        { "expr": "k6_http_req_receiving_seconds{quantile=\"0.95\"}", "legendFormat": "receiving {{ name }}", "refId": "C" },
+        { "expr": "k6_http_req_blocked_seconds{quantile=\"0.95\"}", "legendFormat": "blocked {{ name }}", "refId": "D" }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Error Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 32 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 4,
+          "min": 0,
+          "max": 1,
+          "custom": { "fillOpacity": 30 }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "hidden" }
+      },
+      "targets": [
+        {
+          "expr": "avg(k6_http_req_failed)",
+          "legendFormat": "Error Rate",
           "refId": "A"
         }
       ]

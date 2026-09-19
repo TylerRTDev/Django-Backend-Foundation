@@ -16,6 +16,16 @@
 #   cAdvisor:    http://localhost:8080
 #
 services:
+  memcached-exporter:
+    image: prom/memcached-exporter:latest
+    container_name: django_test_memcached_exporter
+    ports:
+      - "9150:9150"
+    command:
+      - "--memcached.address=memcached:11211"
+    restart: unless-stopped
+    depends_on:
+      - memcached
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: django_test_cadvisor
@@ -44,9 +54,11 @@ services:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--storage.tsdb.path=/prometheus"
       - "--storage.tsdb.retention.time=7d"
+      - "--web.enable-remote-write-receiver"
     restart: unless-stopped
     depends_on:
       - cadvisor
+      - memcached-exporter
 
   grafana:
     image: grafana/grafana:latest

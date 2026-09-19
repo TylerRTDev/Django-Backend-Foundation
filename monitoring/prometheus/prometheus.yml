@@ -25,3 +25,12 @@ scrape_configs:
     #   container_network_transmit_bytes_total
     #   container_fs_usage_bytes
     metrics_path: /metrics
+
+  - job_name: "memcached"
+    static_configs:
+      - targets: ["memcached-exporter:9150"]
+    # Provided by prom/memcached-exporter:
+    #   memcached_get_hits_total / memcached_get_misses_total
+    #   memcached_evictions_total
+    #   memcached_current_items
+    #   memcached_connections_current
