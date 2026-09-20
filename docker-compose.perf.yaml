@@ -6,7 +6,7 @@
 # execution against the web service at http://web:8000.
 #
 # Override the k6 script with:
-#   K6_SCRIPT=api_baseline.js docker compose -f docker-compose.yaml -f docker-compose.perf.yaml run --rm k6
+#   docker compose -f docker-compose.yaml -f docker-compose.perf.yaml run --rm --env K6_SCRIPT=custom.js k6
 #
 # Set worker/thread config before running, either in .env or inline:
 #   WORKERS=4 THREADS=2 TIMEOUT=60 docker compose -f ... up
@@ -15,13 +15,14 @@ services:
   k6:
     image: grafana/k6:latest
     container_name: django_test_k6
-    entrypoint: ["sh", "-c", "k6 run --out experimental-prometheus-rw /scripts/${K6_SCRIPT:-smoke.js}"]
+    entrypoint: ["sh", "-c", "k6 run --out experimental-prometheus-rw /scripts/$$K6_SCRIPT"]
     volumes:
       - ./scripts/k6:/scripts
       - ./Memcache Unconfigured Cache Resutls:/results
     environment:
       BASE_URL: http://web:8000
       K6_PROMETHEUS_RW_SERVER_URL: http://prometheus:9090/api/v1/write
+      K6_PROMETHEUS_RW_TREND_STATS: p50,p90,p95,p99,min,max,avg,count
       K6_SCRIPT: smoke.js
     depends_on:
       - web
