@@ -1,0 +1,36 @@
+# Prometheus scrape configuration for the monitoring stack.
+#
+# Scrapes:
+#   - cAdvisor: container-level CPU, memory, network, disk metrics
+#   - Prometheus itself: self-health
+#
+global:
+  scrape_interval:     5s       # match k6 test resolution
+  evaluation_interval: 5s
+  external_labels:
+    monitor: "django-backend-foundation"
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["cadvisor:8080"]
+    # cAdvisor provides per-container metrics:
+    #   container_cpu_usage_seconds_total
+    #   container_memory_usage_bytes
+    #   container_network_receive_bytes_total
+    #   container_network_transmit_bytes_total
+    #   container_fs_usage_bytes
+    metrics_path: /metrics
+
+  - job_name: "memcached"
+    static_configs:
+      - targets: ["memcached-exporter:9150"]
+    # Provided by prom/memcached-exporter:
+    #   memcached_get_hits_total / memcached_get_misses_total
+    #   memcached_evictions_total
+    #   memcached_current_items
+    #   memcached_connections_current

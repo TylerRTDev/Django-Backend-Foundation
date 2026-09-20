@@ -1,0 +1,82 @@
+# Docker Compose monitoring stack — opt-in for performance test observability.
+#
+# Provides container-level resource metrics (CPU, memory, network, disk)
+# during benchmark runs. Uses cAdvisor → Prometheus → Grafana.
+#
+# Usage (alongside the app stack):
+#   docker compose \
+#     -f docker-compose.yaml \
+#     -f docker-compose.perf.yaml \
+#     -f docker-compose.monitoring.yaml \
+#     up
+#
+# Access:
+#   Grafana:     http://localhost:3000  (admin / admin)
+#   Prometheus:  http://localhost:9090
+#   cAdvisor:    http://localhost:8080
+#
+services:
+  memcached-exporter:
+    image: prom/memcached-exporter:latest
+    container_name: django_test_memcached_exporter
+    ports:
+      - "9150:9150"
+    command:
+      - "--memcached.address=memcached:11211"
+    restart: unless-stopped
+    depends_on:
+      - memcached
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: django_test_cadvisor
+    privileged: true
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: django_test_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=7d"
+      - "--web.enable-remote-write-receiver"
+    restart: unless-stopped
+    depends_on:
+      - cadvisor
+      - memcached-exporter
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: django_test_grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_INSTALL_PLUGINS: ""  # no extra plugins needed
+    volumes:
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus_data:
+  grafana_data:
