@@ -65,7 +65,8 @@ def dogpile_cache_drf(
 
                 cached = cache.get(val_key)
                 if cached is not None:
-                    return cached
+                    # Reconstruct Response from cached data
+                    return Response(cached)
 
                 # Attempt to become the single recomputer.
                 got_lock = cache.add(lock_key, "1", timeout=cfg.lock_ttl)
@@ -73,7 +74,11 @@ def dogpile_cache_drf(
                 if got_lock:
                     try:
                         resp = method(self, request, *args, **kwargs)
-                        cache.set(val_key, resp, timeout=cfg.ttl)
+                        # Cache the serialized data, not the Response object.
+                        # DRF Response cannot be pickled before rendering,
+                        # and pickle is the default serializer for Memcached
+                        # and LocMemCache backends.
+                        cache.set(val_key, resp.data, timeout=cfg.ttl)
                         return resp
                     finally:
                         cache.delete(lock_key)
@@ -84,7 +89,8 @@ def dogpile_cache_drf(
                     time.sleep(cfg.poll_interval_ms / 1000.0)
                     cached = cache.get(val_key)
                     if cached is not None:
-                        return cached
+                        # Reconstruct Response from cached data
+                        return Response(cached)
 
                 # Fallback: recompute normally if winner is slow.
                 return method(self, request, *args, **kwargs)
@@ -132,7 +138,8 @@ def dogpile_cache_drf_swr(
 
                 fresh = cache.get(fresh_key)
                 if fresh is not None:
-                    return fresh
+                    # Reconstruct Response from cached data
+                    return Response(fresh)
 
                 stale = cache.get(stale_key)
 
@@ -140,15 +147,16 @@ def dogpile_cache_drf_swr(
                 if got_lock:
                     try:
                         resp = method(self, request, *args, **kwargs)
-                        cache.set(fresh_key, resp, timeout=cfg.ttl)
-                        cache.set(stale_key, resp, timeout=cfg.ttl + cfg.stale_grace)
+                        data = resp.data
+                        cache.set(fresh_key, data, timeout=cfg.ttl)
+                        cache.set(stale_key, data, timeout=cfg.ttl + cfg.stale_grace)
                         return resp
                     finally:
                         cache.delete(lock_key)
 
                 # Non-winner: serve stale immediately if available.
                 if stale is not None:
-                    return stale
+                    return Response(stale)
 
                 # No stale available: short wait then fail open.
                 deadline = time.monotonic() + (cfg.wait_ms / 1000.0)
@@ -156,7 +164,8 @@ def dogpile_cache_drf_swr(
                     time.sleep(cfg.poll_interval_ms / 1000.0)
                     fresh = cache.get(fresh_key)
                     if fresh is not None:
-                        return fresh
+                        # Reconstruct Response from cached data
+                        return Response(fresh)
 
                 return method(self, request, *args, **kwargs)
 
