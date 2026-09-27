@@ -78,7 +78,15 @@ def dogpile_cache_drf(
                         # DRF Response cannot be pickled before rendering,
                         # and pickle is the default serializer for Memcached
                         # and LocMemCache backends.
-                        cache.set(val_key, resp.data, timeout=cfg.ttl)
+                        #
+                        # Defensive, not corrective: today DRF raises Http404
+                        # rather than returning a 4xx Response, so this guard
+                        # is unreachable. It stays because a future @action
+                        # that returns Response(..., status=400) directly would
+                        # otherwise cache the error body and replay it as 200
+                        # (Response(cached) uses the default status code).
+                        if 200 <= resp.status_code < 300:
+                            cache.set(val_key, resp.data, timeout=cfg.ttl)
                         return resp
                     finally:
                         cache.delete(lock_key)
@@ -147,9 +155,14 @@ def dogpile_cache_drf_swr(
                 if got_lock:
                     try:
                         resp = method(self, request, *args, **kwargs)
-                        data = resp.data
-                        cache.set(fresh_key, data, timeout=cfg.ttl)
-                        cache.set(stale_key, data, timeout=cfg.ttl + cfg.stale_grace)
+                        # Defensive, not corrective: see dogpile_cache_drf.
+                        # Only cache successful responses — a 4xx body cached
+                        # and reconstructed as Response(cached) would be
+                        # replayed with the default 200 status.
+                        if 200 <= resp.status_code < 300:
+                            data = resp.data
+                            cache.set(fresh_key, data, timeout=cfg.ttl)
+                            cache.set(stale_key, data, timeout=cfg.ttl + cfg.stale_grace)
                         return resp
                     finally:
                         cache.delete(lock_key)
