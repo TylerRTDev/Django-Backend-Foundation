@@ -4,7 +4,7 @@ from .base import *
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 
 # For development, allow CSRF from the ngrok domain to enable testing with external tools
-CSRF_TRUSTED_ORIGINS = ['https://festive-lowell-leguminous.ngrok-free.dev']
+CSRF_TRUSTED_ORIGINS = ['https://festive-lowell-leguminous.ngrok-free.dev', 'https://*.ngrok-free.dev']
 
 INSTALLED_APPS += [
     'storages',
@@ -61,22 +61,42 @@ CACHES = {
 # }
 
 # Storage configuration to include multiple bucket storage with MinIO and bucket configurations
+USE_NGROK = config('USE_NGROK', default=False, cast=bool)
 
-STORAGES = { 
-    "default": {
-        "BACKEND": "config.storage_backends.MinioMediaStorageTesting",
-    },
-    
-    "staticfiles": {
-        "BACKEND": "config.storage_backends.MinioStaticStorageTesting",
-        "OPTIONS": {},
-    },
-    
-    "privatefiles": {
-        "BACKEND": "config.storage_backends.MinioMediaStoragePrivateTesting",
-        "OPTIONS": {},
+if USE_NGROK:
+    # When using ngrok, serve static and media files locally to ensure they are accessible via the same domain
+    STORAGES = { 
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+            "OPTIONS": {},
+        },
+        
+        "privatefiles": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        }
     }
-}
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = BASE_DIR / 'media'
+else:
+    STORAGES = { 
+        "default": {
+            "BACKEND": "config.storage_backends.MinioMediaStorageTesting",
+        },
+        
+        "staticfiles": {
+            "BACKEND": "config.storage_backends.MinioStaticStorageTesting",
+            "OPTIONS": {},
+        },
+        
+        "privatefiles": {
+            "BACKEND": "config.storage_backends.MinioMediaStoragePrivateTesting",
+            "OPTIONS": {},
+        }
+    }
 
 # MinIO specific settings
 

@@ -103,6 +103,21 @@ services:
     depends_on:
       - db
 
+  ngrok:
+    image: ngrok/ngrok:latest
+    profiles: ["ngrok"]
+    container_name: django_test_ngrok
+    environment:
+      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
+    command: "start --all --config /etc/ngrok/ngrok-config.yml --log stdout"
+    volumes:
+      - ./ngrok-config.yml:/etc/ngrok/ngrok-config.yml
+    ports:
+      - "4040:4040"
+    depends_on:
+      - web
+      - minio
+
 volumes:
   postgres_data:
   minio_data:

@@ -235,6 +235,24 @@ The infrastructure-first foundation is in place: split settings, PostgreSQL, Min
 
 ---
 
+## 🌐 Exposing with Ngrok
+
+To expose the Django app to the internet for testing (e.g., mobile testing, webhook callbacks), you can use ngrok with the provided configuration.
+
+1. Sign up for a free account at [ngrok.com](https://ngrok.com) and copy your authtoken.
+2. Add `NGROK_AUTHTOKEN=your_token_here` and `USE_NGROK=True` to your `.env` file.
+3. Run `./start-ngrok.sh` (or `docker compose --profile ngrok up`).
+
+Ngrok will start two tunnels:
+- **Web app**: exposes the Django application (port 8000)
+- **MinIO**: exposes the MinIO object storage (port 9000) for static/media files
+
+When `USE_NGROK=True`, static files are served via Django's WhiteNoise middleware to ensure they load correctly over the ngrok tunnel.
+
+For detailed instructions, see [NGROK-GUIDE.md](./NGROK-GUIDE.md).
+
+---
+
 ## 👤 Author
 
 Built by **TylerRTDev** — [GitHub](https://github.com/TylerRTDev)
