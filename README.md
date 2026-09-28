@@ -129,6 +129,20 @@ Design properties (per the ADR): **fail-open** (a cache outage falls back to nor
 
 📄 **Design & verification:** [`phase_4_dogpile_adr.md`](./phase_4_dogpile_adr.md) — the full ADR covering execution flows, a worked TTL timeline, tuning parameters, failure modes, before/after behaviour, and the k6 / Memcached verification method.
 
+### Benchmark suite
+
+Three phases of the caching benchmark suite, run from the project root:
+
+```bash
+./scripts/k6/run_cache_suite.sh coldwarm    # what does caching buy us?
+./scripts/k6/run_cache_suite.sh capacity    # where does the host saturate?
+RATE=<60% of ceiling> ./scripts/k6/run_cache_suite.sh stampede   # does the lock work?
+```
+
+The full suite is orchestrated by `run_cache_suite.sh`, which flushes memcached between phases, captures the environment alongside results, and saves everything under `results/cache-suite-<timestamp>/`. See `CACHE_RUNBOOK.md` for the run schedule and cross-reference checks.
+
+**Note:** run the benchmark from the desktop host. The RPi4 is the system under test — running k6 on the same box contends for the same four cores and produces worthless numbers.
+
 **In progress — Redis + API-layer scalability.** The current focus of this phase is introducing **Redis** (better suited to production scale, with native distributed-locking patterns) and expanding the **DRF API layer** to test scalability and explore API-level caching techniques (specific strategies still being determined) beyond the existing view/page caching. The read-only `/api/me/` endpoint is the starting point for that API surface.
 
 ### Phase 5 — Cloudflare CDN (live) · ⏳ Planned
