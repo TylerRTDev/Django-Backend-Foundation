@@ -32,12 +32,12 @@
 </nav>
 
 <div class="product-grid">
-  {% for product in page_obj.object_list %}
+  {% for product, quote in product_quotes %}
     <a href="{% url 'products:product_detail' product.slug %}" class="product-card">
       <h2 style="text-transform: uppercase; letter-spacing: 0.12rem;">
         {{ product.name }}
       </h2>
-      <p>This is a generic item for testing purposes.</p>
+      <p>“{{ quote.content }}” &mdash; {{ quote.author }}</p>
       <span class="product-status">Click for details</span>
     </a>
   {% empty %}
