@@ -53,7 +53,9 @@ def dogpile_cache_drf(
         ) -> Response:
             # Authenticated users bypass the shared cache.
             if request.user.is_authenticated and not cfg.cache_authenticated:
-                return method(self, request, *args, **kwargs)
+                resp = method(self, request, *args, **kwargs)
+                resp["X-Cache"] = "BYPASS"
+                return resp
 
             variant = variant_resolver(request) if variant_resolver else "full"
             cache = caches[cfg.cache_alias]
@@ -66,7 +68,9 @@ def dogpile_cache_drf(
                 cached = cache.get(val_key)
                 if cached is not None:
                     # Reconstruct Response from cached data
-                    return Response(cached)
+                    resp = Response(cached)
+                    resp["X-Cache"] = "HIT"
+                    return resp
 
                 # Attempt to become the single recomputer.
                 got_lock = cache.add(lock_key, "1", timeout=cfg.lock_ttl)
@@ -78,7 +82,16 @@ def dogpile_cache_drf(
                         # DRF Response cannot be pickled before rendering,
                         # and pickle is the default serializer for Memcached
                         # and LocMemCache backends.
-                        cache.set(val_key, resp.data, timeout=cfg.ttl)
+                        #
+                        # Defensive, not corrective: today DRF raises Http404
+                        # rather than returning a 4xx Response, so this guard
+                        # is unreachable. It stays because a future @action
+                        # that returns Response(..., status=400) directly would
+                        # otherwise cache the error body and replay it as 200
+                        # (Response(cached) uses the default status code).
+                        if 200 <= resp.status_code < 300:
+                            cache.set(val_key, resp.data, timeout=cfg.ttl)
+                        resp["X-Cache"] = "MISS"
                         return resp
                     finally:
                         cache.delete(lock_key)
@@ -90,14 +103,20 @@ def dogpile_cache_drf(
                     cached = cache.get(val_key)
                     if cached is not None:
                         # Reconstruct Response from cached data
-                        return Response(cached)
+                        resp = Response(cached)
+                        resp["X-Cache"] = "WAIT"
+                        return resp
 
                 # Fallback: recompute normally if winner is slow.
-                return method(self, request, *args, **kwargs)
+                resp = method(self, request, *args, **kwargs)
+                resp["X-Cache"] = "BYPASS"
+                return resp
 
             except Exception:
                 # Fail-open: never break the API because of cache/lock issues.
-                return method(self, request, *args, **kwargs)
+                resp = method(self, request, *args, **kwargs)
+                resp["X-Cache"] = "BYPASS"
+                return resp
 
         return wrapped
     return decorator
@@ -125,7 +144,9 @@ def dogpile_cache_drf_swr(
             **kwargs: Any,
         ) -> Response:
             if request.user.is_authenticated and not cfg.cache_authenticated:
-                return method(self, request, *args, **kwargs)
+                resp = method(self, request, *args, **kwargs)
+                resp["X-Cache"] = "BYPASS"
+                return resp
 
             variant = variant_resolver(request) if variant_resolver else "full"
             cache = caches[cfg.cache_alias]
@@ -139,7 +160,9 @@ def dogpile_cache_drf_swr(
                 fresh = cache.get(fresh_key)
                 if fresh is not None:
                     # Reconstruct Response from cached data
-                    return Response(fresh)
+                    resp = Response(fresh)
+                    resp["X-Cache"] = "HIT"
+                    return resp
 
                 stale = cache.get(stale_key)
 
@@ -147,16 +170,24 @@ def dogpile_cache_drf_swr(
                 if got_lock:
                     try:
                         resp = method(self, request, *args, **kwargs)
-                        data = resp.data
-                        cache.set(fresh_key, data, timeout=cfg.ttl)
-                        cache.set(stale_key, data, timeout=cfg.ttl + cfg.stale_grace)
+                        # Defensive, not corrective: see dogpile_cache_drf.
+                        # Only cache successful responses — a 4xx body cached
+                        # and reconstructed as Response(cached) would be
+                        # replayed with the default 200 status.
+                        if 200 <= resp.status_code < 300:
+                            data = resp.data
+                            cache.set(fresh_key, data, timeout=cfg.ttl)
+                            cache.set(stale_key, data, timeout=cfg.ttl + cfg.stale_grace)
+                        resp["X-Cache"] = "MISS"
                         return resp
                     finally:
                         cache.delete(lock_key)
 
                 # Non-winner: serve stale immediately if available.
                 if stale is not None:
-                    return Response(stale)
+                    resp = Response(stale)
+                    resp["X-Cache"] = "STALE"
+                    return resp
 
                 # No stale available: short wait then fail open.
                 deadline = time.monotonic() + (cfg.wait_ms / 1000.0)
@@ -165,12 +196,18 @@ def dogpile_cache_drf_swr(
                     fresh = cache.get(fresh_key)
                     if fresh is not None:
                         # Reconstruct Response from cached data
-                        return Response(fresh)
+                        resp = Response(fresh)
+                        resp["X-Cache"] = "WAIT"
+                        return resp
 
-                return method(self, request, *args, **kwargs)
+                resp = method(self, request, *args, **kwargs)
+                resp["X-Cache"] = "BYPASS"
+                return resp
 
             except Exception:
-                return method(self, request, *args, **kwargs)
+                resp = method(self, request, *args, **kwargs)
+                resp["X-Cache"] = "BYPASS"
+                return resp
 
         return wrapped
     return decorator

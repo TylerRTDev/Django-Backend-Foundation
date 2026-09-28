@@ -35,7 +35,9 @@ def dogpile_cache(cfg: DogpileConfig, *, variant_resolver: Optional[Callable[[Ht
         def wrapped(request: HttpRequest, *args, **kwargs) -> HttpResponse:
             # Never globally cache authenticated responses.
             if request.user.is_authenticated and not cfg.cache_authenticated:
-                return view_func(request, *args, **kwargs)
+                resp = view_func(request, *args, **kwargs)
+                resp["X-Cache"] = "BYPASS"
+                return resp
 
             variant = variant_resolver(request) if variant_resolver else "full"
             cache = caches[cfg.cache_alias]
@@ -47,6 +49,7 @@ def dogpile_cache(cfg: DogpileConfig, *, variant_resolver: Optional[Callable[[Ht
 
                 cached = cache.get(val_key)
                 if cached is not None:
+                    cached["X-Cache"] = "HIT"
                     return cached
 
                 # Attempt to become the single recomputer.
@@ -57,6 +60,7 @@ def dogpile_cache(cfg: DogpileConfig, *, variant_resolver: Optional[Callable[[Ht
                         resp = view_func(request, *args, **kwargs)
                         # Store the whole HttpResponse object (works with Memcached pickle serializer).
                         cache.set(val_key, resp, timeout=cfg.ttl)
+                        resp["X-Cache"] = "MISS"   # AFTER the set — header is pickled
                         return resp
                     finally:
                         cache.delete(lock_key)
@@ -67,14 +71,19 @@ def dogpile_cache(cfg: DogpileConfig, *, variant_resolver: Optional[Callable[[Ht
                     time.sleep(cfg.poll_interval_ms / 1000.0)
                     cached = cache.get(val_key)
                     if cached is not None:
+                        cached["X-Cache"] = "WAIT"
                         return cached
 
                 # Fail-open fallback: just compute normally if winner is slow.
-                return view_func(request, *args, **kwargs)
+                resp = view_func(request, *args, **kwargs)
+                resp["X-Cache"] = "BYPASS"
+                return resp
 
             except Exception:
                 # Fail-open: never break the site because of cache/lock issues.
-                return view_func(request, *args, **kwargs)
+                resp = view_func(request, *args, **kwargs)
+                resp["X-Cache"] = "BYPASS"
+                return resp
 
         return wrapped
     return decorator
@@ -87,7 +96,9 @@ def dogpile_cache_swr(cfg: SWRConfig, *, variant_resolver: Optional[Callable[[Ht
     def decorator(view_func: Callable[[HttpRequest], HttpResponse]):
         def wrapped(request: HttpRequest, *args, **kwargs) -> HttpResponse:
             if request.user.is_authenticated:
-                return view_func(request, *args, **kwargs)
+                resp = view_func(request, *args, **kwargs)
+                resp["X-Cache"] = "BYPASS"
+                return resp
 
             variant = variant_resolver(request) if variant_resolver else "full"
             cache = caches[cfg.cache_alias]
@@ -100,6 +111,7 @@ def dogpile_cache_swr(cfg: SWRConfig, *, variant_resolver: Optional[Callable[[Ht
 
                 fresh = cache.get(fresh_key)
                 if fresh is not None:
+                    fresh["X-Cache"] = "HIT"
                     return fresh
 
                 stale = cache.get(stale_key)
@@ -110,12 +122,14 @@ def dogpile_cache_swr(cfg: SWRConfig, *, variant_resolver: Optional[Callable[[Ht
                         resp = view_func(request, *args, **kwargs)
                         cache.set(fresh_key, resp, timeout=cfg.ttl)
                         cache.set(stale_key, resp, timeout=cfg.ttl + cfg.stale_grace)
+                        resp["X-Cache"] = "MISS"   # AFTER the set — header is pickled
                         return resp
                     finally:
                         cache.delete(lock_key)
 
                 # Non-winner: serve stale immediately if available
                 if stale is not None:
+                    stale["X-Cache"] = "STALE"
                     return stale
 
                 # No stale available: short wait then fail open
@@ -124,12 +138,17 @@ def dogpile_cache_swr(cfg: SWRConfig, *, variant_resolver: Optional[Callable[[Ht
                     time.sleep(cfg.poll_interval_ms / 1000.0)
                     fresh = cache.get(fresh_key)
                     if fresh is not None:
+                        fresh["X-Cache"] = "WAIT"
                         return fresh
 
-                return view_func(request, *args, **kwargs)
+                resp = view_func(request, *args, **kwargs)
+                resp["X-Cache"] = "BYPASS"
+                return resp
 
             except Exception:
-                return view_func(request, *args, **kwargs)
+                resp = view_func(request, *args, **kwargs)
+                resp["X-Cache"] = "BYPASS"
+                return resp
 
         return wrapped
     return decorator
