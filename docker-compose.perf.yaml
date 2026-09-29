@@ -22,7 +22,7 @@ services:
     environment:
       BASE_URL: http://web:8000
       K6_PROMETHEUS_RW_SERVER_URL: http://prometheus:9090/api/v1/write
-      K6_PROMETHEUS_RW_TREND_STATS: p50,p90,p95,p99,min,max,avg,count
+      K6_PROMETHEUS_RW_TREND_STATS: p(50),p(90),p(95),p(99),min,max,avg,count
       K6_SCRIPT: smoke.js
     depends_on:
       - web
