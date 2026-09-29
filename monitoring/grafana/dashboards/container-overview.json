@@ -1,44 +1,74 @@
 {
   "title": "Performance Test Dashboard",
-  "description": "Live benchmark metrics: container resources, cache performance, k6 load test results with percentile filtering",
-  "schemaVersion": 38,
-  "version": 2,
+  "uid": "performance-test-dashboard",
+  "description": "Live benchmark metrics: container resources, memcached cache behaviour, k6 load test results with percentile filtering",
+  "schemaVersion": 39,
+  "version": 3,
+  "refresh": "5s",
   "time": {
-    "from": "now-5m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {},
   "tags": ["monitoring", "docker", "benchmark", "k6", "cache"],
+
+  "templating": {
+    "list": [
+      {
+        "name": "container",
+        "label": "Container",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "Prometheus" },
+        "query": "label_values(container_cpu_usage_seconds_total{name!=\"\"}, name)",
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".+",
+        "sort": 1,
+        "current": { "selected": true, "text": ["All"], "value": ["$__all"] }
+      }
+    ]
+  },
+
   "panels": [
     {
       "id": 1,
-      "title": "CPU Usage (by container)",
+      "title": "CPU Usage (cores, by container)",
+      "description": "1.0 = one full CPU core. Stacked, so the total can and should exceed 1.0 on a multi-core host. Deselect grafana/cadvisor/prometheus in the $container picker to isolate the system under test.",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
       "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
-          "decimals": 2,
+          "decimals": 1,
           "min": 0,
-          "max": 1,
-          "custom": { "stacking": { "mode": "normal" }, "fillOpacity": 30 }
+          "custom": {
+            "stacking": { "mode": "normal" },
+            "fillOpacity": 25,
+            "spanNulls": false
+          }
         }
       },
       "options": {
-        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true }
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
       },
       "targets": [
         {
-          "expr": "sum(rate(container_cpu_usage_seconds_total{name!=\"\"}[30s])) by (name)",
-          "legendFormat": "{{ name }}",
-          "refId": "A"
+          "refId": "A",
+          "editorMode": "code",
+          "range": true,
+          "expr": "sum by (name) (rate(container_cpu_usage_seconds_total{name=~\"$container\"}[$__rate_interval]))",
+          "legendFormat": "{{ name }}"
         }
       ]
     },
+
     {
       "id": 2,
-      "title": "Memory Usage (by container)",
+      "title": "Memory Working Set (by container)",
+      "description": "working_set excludes reclaimable page cache, so it tracks real pressure. max by (name) collapses cAdvisor's duplicate per-cgroup series.",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
       "datasource": { "type": "prometheus", "uid": "Prometheus" },
@@ -46,207 +76,424 @@
         "defaults": {
           "unit": "bytes",
           "decimals": 1,
-          "custom": { "stacking": { "mode": "normal" }, "fillOpacity": 30 }
+          "min": 0,
+          "custom": {
+            "stacking": { "mode": "normal" },
+            "fillOpacity": 25,
+            "spanNulls": false
+          }
         }
       },
       "options": {
-        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true }
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
       },
       "targets": [
         {
-          "expr": "container_memory_usage_bytes{name!=\"\"}",
-          "legendFormat": "{{ name }}",
-          "refId": "A"
+          "refId": "A",
+          "editorMode": "code",
+          "range": true,
+          "expr": "max by (name) (container_memory_working_set_bytes{name=~\"$container\"})",
+          "legendFormat": "{{ name }}"
         }
       ]
     },
+
     {
       "id": 3,
-      "title": "Cache Hit Rate",
+      "title": "Cache Hit Rate (memcached GET)",
+      "description": "Undefined when there is no GET traffic - gaps are honest, not a fault. Watch this climb toward 1.0 as the dogpile cache warms during a k6 run.",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 8, "x": 0, "y": 8 },
       "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
-          "decimals": 3,
+          "decimals": 2,
           "min": 0,
           "max": 1,
-          "custom": { "fillOpacity": 30 }
+          "custom": { "fillOpacity": 30, "spanNulls": false, "lineWidth": 2 }
         }
       },
       "options": {
-        "legend": { "displayMode": "hidden" }
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi" }
       },
       "targets": [
         {
-          "expr": "rate(memcached_get_hits_total[30s]) / (rate(memcached_get_hits_total[30s]) + rate(memcached_get_misses_total[30s]))",
-          "legendFormat": "Hit Rate",
-          "refId": "A"
+          "refId": "A",
+          "editorMode": "code",
+          "range": true,
+          "expr": "sum by (instance) (rate(memcached_commands_total{command=\"get\",status=\"hit\"}[$__rate_interval])) / sum by (instance) (rate(memcached_commands_total{command=\"get\"}[$__rate_interval]))",
+          "legendFormat": "Hit rate"
         }
       ]
     },
+
     {
-      "id": 4,
-      "title": "Cache Current Items",
+      "id": 11,
+      "title": "Cache Ops/sec (GET by status)",
+      "description": "Never goes NaN. Use this to confirm traffic is actually reaching memcached before reading the hit-rate panel.",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 8, "x": 8, "y": 8 },
       "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "fieldConfig": {
         "defaults": {
-          "decimals": 0,
-          "custom": { "fillOpacity": 30 }
+          "unit": "ops",
+          "decimals": 2,
+          "min": 0,
+          "custom": {
+            "stacking": { "mode": "normal" },
+            "fillOpacity": 40,
+            "drawStyle": "bars",
+            "spanNulls": false
+          }
         }
       },
       "options": {
-        "legend": { "displayMode": "hidden" }
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi" }
       },
       "targets": [
         {
-          "expr": "memcached_current_items",
-          "legendFormat": "Items",
-          "refId": "A"
+          "refId": "A",
+          "editorMode": "code",
+          "range": true,
+          "expr": "sum by (status) (rate(memcached_commands_total{command=\"get\"}[$__rate_interval]))",
+          "legendFormat": "{{ status }}"
         }
       ]
     },
+
     {
-      "id": 5,
-      "title": "Cache Evictions",
+      "id": 12,
+      "title": "Cache Writes/sec (dogpile lock + value sets)",
+      "description": "CAVEAT: memcached's stats roll cache.add() and cache.set() together into cmd_set, so this cannot separate lock acquisitions from value writes. The stampede signal is the SHAPE: under a concurrency spike at a TTL boundary, this should stay near-flat rather than scaling with VUs.",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 8, "x": 16, "y": 8 },
       "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "fieldConfig": {
         "defaults": {
-          "custom": { "fillOpacity": 20 }
+          "unit": "ops",
+          "decimals": 2,
+          "min": 0,
+          "custom": { "fillOpacity": 25, "spanNulls": false, "lineWidth": 2 }
         }
       },
       "options": {
-        "legend": { "displayMode": "hidden" }
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi" }
       },
       "targets": [
         {
-          "expr": "rate(memcached_evictions_total[30s])",
-          "legendFormat": "Evictions/s",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 6,
-      "title": "Request Rate (RPS)",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
-      "datasource": { "type": "prometheus", "uid": "Prometheus" },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "rps",
-          "decimals": 1,
-          "custom": { "fillOpacity": 20 }
-        }
-      },
-      "options": {
-        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true }
-      },
-      "targets": [
+          "refId": "A",
+          "editorMode": "code",
+          "range": true,
+          "expr": "sum(rate(memcached_commands_total{command=\"set\"}[$__rate_interval]))",
+          "legendFormat": "writes/s"
+        },
         {
-          "expr": "sum(rate(k6_http_reqs_total[30s])) by (name)",
-          "legendFormat": "{{ name }}",
-          "refId": "A"
+          "refId": "B",
+          "editorMode": "code",
+          "range": true,
+          "expr": "sum(rate(memcached_commands_total{command=\"delete\"}[$__rate_interval]))",
+          "legendFormat": "lock releases/s (delete)"
         }
       ]
     },
+
     {
-      "id": 7,
-      "title": "Active VUs",
+      "id": 4,
+      "title": "Cache Current Items",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "gridPos": { "h": 6, "w": 8, "x": 0, "y": 16 },
       "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "fieldConfig": {
         "defaults": {
+          "unit": "short",
           "decimals": 0,
-          "custom": { "fillOpacity": 30 }
+          "min": 0,
+          "custom": { "fillOpacity": 30, "spanNulls": false }
         }
       },
       "options": {
-        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true }
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "single" }
       },
       "targets": [
         {
-          "expr": "k6_vus",
-          "legendFormat": "VUs",
-          "refId": "A"
+          "refId": "A",
+          "editorMode": "code",
+          "range": true,
+          "expr": "memcached_current_items",
+          "legendFormat": "Items"
         }
       ]
     },
+
     {
-      "id": 8,
-      "title": "Response Time (p50 / p90 / p95 / p99)",
+      "id": 5,
+      "title": "Cache Evictions/sec",
+      "description": "Guard panel - should stay at zero. Any sustained value means memcached is under memory pressure and your TTLs are not the thing controlling cache lifetime.",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 },
+      "gridPos": { "h": 6, "w": 8, "x": 8, "y": 16 },
       "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "fieldConfig": {
         "defaults": {
-          "unit": "s",
-          "decimals": 3,
-          "custom": { "fillOpacity": 10 }
+          "unit": "ops",
+          "decimals": 2,
+          "min": 0,
+          "custom": { "fillOpacity": 20, "spanNulls": false }
         }
       },
       "options": {
-        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true }
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "single" }
       },
       "targets": [
-        { "expr": "k6_http_req_duration_p50", "legendFormat": "p50 {{ name }}", "refId": "A" },
-        { "expr": "k6_http_req_duration_p90", "legendFormat": "p90 {{ name }}", "refId": "B" },
-        { "expr": "k6_http_req_duration_p95", "legendFormat": "p95 {{ name }}", "refId": "C" },
-        { "expr": "k6_http_req_duration_p99", "legendFormat": "p99 {{ name }}", "refId": "D" }
-      ]
-    },
-    {
-      "id": 9,
-      "title": "HTTP Request Breakdown (p95)",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 },
-      "datasource": { "type": "prometheus", "uid": "Prometheus" },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "s",
-          "decimals": 4,
-          "custom": { "fillOpacity": 20 }
+        {
+          "refId": "A",
+          "editorMode": "code",
+          "range": true,
+          "expr": "rate(memcached_items_evicted_total[$__rate_interval])",
+          "legendFormat": "Evictions/s"
         }
-      },
-      "options": {
-        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true }
-      },
-      "targets": [
-        { "expr": "k6_http_req_waiting_p95", "legendFormat": "waiting (TTFB) {{ name }}", "refId": "A" },
-        { "expr": "k6_http_req_sending_p95", "legendFormat": "sending {{ name }}", "refId": "B" },
-        { "expr": "k6_http_req_receiving_p95", "legendFormat": "receiving {{ name }}", "refId": "C" },
-        { "expr": "k6_http_req_blocked_p95", "legendFormat": "blocked {{ name }}", "refId": "D" }
       ]
     },
+
     {
-      "id": 10,
-      "title": "Error Rate",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 32 },
+      "id": 13,
+      "title": "Lifetime GET Hit Ratio",
+      "description": "Cumulative since memcached started. Unlike the rate-based panel this stays readable with zero live traffic - use it as the sanity check against `stats` over telnet.",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 8, "x": 16, "y": 16 },
       "datasource": { "type": "prometheus", "uid": "Prometheus" },
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
-          "decimals": 4,
+          "decimals": 2,
           "min": 0,
           "max": 1,
-          "custom": { "fillOpacity": 30 }
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 0.5 },
+              { "color": "green", "value": 0.8 }
+            ]
+          }
         }
       },
       "options": {
-        "legend": { "displayMode": "hidden" }
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "value",
+        "graphMode": "area",
+        "textMode": "auto"
       },
       "targets": [
         {
-          "expr": "avg(k6_http_req_failed_rate)",
-          "legendFormat": "Error Rate",
-          "refId": "A"
+          "refId": "A",
+          "editorMode": "code",
+          "range": true,
+          "expr": "sum(memcached_commands_total{command=\"get\",status=\"hit\"}) / sum(memcached_commands_total{command=\"get\"})",
+          "legendFormat": "Lifetime hit ratio"
+        }
+      ]
+    },
+
+    {
+      "id": 6,
+      "title": "Request Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 22 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "decimals": 1,
+          "min": 0,
+          "custom": { "fillOpacity": 20, "spanNulls": false, "lineWidth": 2 }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "editorMode": "code",
+          "range": true,
+          "expr": "sum by (name) (rate(k6_http_reqs_total[$__rate_interval]))",
+          "legendFormat": "{{ name }}"
+        },
+        {
+          "refId": "B",
+          "editorMode": "code",
+          "range": true,
+          "expr": "sum(rate(k6_http_reqs_total[$__rate_interval]))",
+          "legendFormat": "TOTAL"
+        }
+      ]
+    },
+
+    {
+      "id": 7,
+      "title": "Active VUs",
+      "description": "Remote-write gauges hold their last value. If this stays flat while Request Rate has gone silent, the plateau is an artifact - not five minutes of load.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 22 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "min": 0,
+          "custom": { "fillOpacity": 30, "spanNulls": false }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "editorMode": "code",
+          "range": true,
+          "expr": "k6_vus",
+          "legendFormat": "VUs"
+        },
+        {
+          "refId": "B",
+          "editorMode": "code",
+          "range": true,
+          "expr": "k6_vus_max",
+          "legendFormat": "VUs max"
+        }
+      ]
+    },
+
+    {
+      "id": 8,
+      "title": "Response Time (p50 / p90 / p95 / p99)",
+      "description": "Durations are in seconds (base units). Cross-check against the k6 end-of-test summary.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 30 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 2,
+          "min": 0,
+          "custom": { "fillOpacity": 0, "spanNulls": false, "lineWidth": 2 }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        { "refId": "A", "editorMode": "code", "range": true, "expr": "k6_http_req_duration_p50", "legendFormat": "p50 {{ name }}" },
+        { "refId": "B", "editorMode": "code", "range": true, "expr": "k6_http_req_duration_p90", "legendFormat": "p90 {{ name }}" },
+        { "refId": "C", "editorMode": "code", "range": true, "expr": "k6_http_req_duration_p95", "legendFormat": "p95 {{ name }}" },
+        { "refId": "D", "editorMode": "code", "range": true, "expr": "k6_http_req_duration_p99", "legendFormat": "p99 {{ name }}" }
+      ]
+    },
+
+    {
+      "id": 9,
+      "title": "HTTP Request Breakdown (p95)",
+      "description": "waiting (TTFB) is the Django-side cost; blocked/sending/receiving are client and network.",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 30 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "decimals": 2,
+          "min": 0,
+          "custom": { "fillOpacity": 20, "spanNulls": false }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true, "calcs": ["mean", "max"] },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      },
+      "targets": [
+        { "refId": "A", "editorMode": "code", "range": true, "expr": "k6_http_req_waiting_p95", "legendFormat": "waiting (TTFB) {{ name }}" },
+        { "refId": "B", "editorMode": "code", "range": true, "expr": "k6_http_req_sending_p95", "legendFormat": "sending {{ name }}" },
+        { "refId": "C", "editorMode": "code", "range": true, "expr": "k6_http_req_receiving_p95", "legendFormat": "receiving {{ name }}" },
+        { "refId": "D", "editorMode": "code", "range": true, "expr": "k6_http_req_blocked_p95", "legendFormat": "blocked {{ name }}" }
+      ]
+    },
+
+    {
+      "id": 10,
+      "title": "Error Rate",
+      "description": "max, not avg - averaging across endpoints hides a single failing one.",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 38 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 3,
+          "min": 0,
+          "max": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "orange", "value": 0.01 },
+              { "color": "red", "value": 0.05 }
+            ]
+          }
+        }
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["max"], "fields": "", "values": false },
+        "colorMode": "background",
+        "graphMode": "area",
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "editorMode": "code",
+          "range": true,
+          "expr": "max(k6_http_req_failed_rate)",
+          "legendFormat": "Error Rate"
+        }
+      ]
+    },
+
+    {
+      "id": 14,
+      "title": "Iterations/sec",
+      "description": "Cross-check for Request Rate. If VUs are active but this is zero, the k6 writer has stopped and every k6 panel on this board is stale.",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 18, "x": 6, "y": 38 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "iops",
+          "decimals": 2,
+          "min": 0,
+          "custom": { "fillOpacity": 20, "spanNulls": false }
+        }
+      },
+      "options": {
+        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
+        "tooltip": { "mode": "single" }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "editorMode": "code",
+          "range": true,
+          "expr": "sum(rate(k6_iterations_total[$__rate_interval]))",
+          "legendFormat": "iterations/s"
         }
       ]
     }
